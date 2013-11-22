@@ -11,6 +11,7 @@ Ibfluencer: for the framework which i used to make this work
 PIOTRASD: for compiling the python 2.7.3 package
 
 05.10.13
+1.0.6 - merged missing library and updated version
 1.0.5 - Added 2 more packages for dependencies if not installed together with Sickbeard
 1.0.4 - Specified Pythonversion
 1.0.3 - Added Screen package
@@ -81,7 +82,7 @@ rm /tmp/PlexConnect-cleanup
 <FILE Name="/boot/config/plugins/PlexConnect/plgver.txt">
 <INLINE>
 <![CDATA[
-1.0.5
+1.0.6
 ]]>
 </INLINE>
 </FILE>
