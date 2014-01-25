@@ -311,7 +311,7 @@ source /boot/config/plugins/couchpotato_v2/couchpotato_v2.cfg
 	fi	
 	
 	cd /tmp
-	git clone -b $BRANCH $INSTALLURL Couchpotato
+	git clone -b $BRANCH $INSTALLURL CouchPotatoServer
 	cp -Rfu /tmp/CouchPotatoServer/. $INSTALLDIR
 	rm -Rf /tmp/CouchPotatoServer
 	
