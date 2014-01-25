@@ -21,17 +21,9 @@ I have...
 <URL>http://slackware.cs.utah.edu/pub/slackware/slackware64-14.1/slackware64/d/python-2.7.5-x86_64-1.txz</URL>
 <MD5>9b37a33a41b263c945fddb58949386f0</MD5>
 </FILE>
-<FILE Name="/boot/packages/zlib-1.2.8-x86_64-1.txz" Run="upgradepkg --install-new">
-<URL>http://slackware.cs.utah.edu/pub/slackware/slackware64-14.1/slackware64/l/zlib-1.2.8-x86_64-1.txz</URL>
-<MD5>9c91095f98fdd2e899d46acd6bf3c482</MD5>
-</FILE>
 <FILE Name="/boot/packages/sqlite-3.7.17-x86_64-1.txz" Run="upgradepkg --install-new">
 <URL>http://slackware.cs.utah.edu/pub/slackware/slackware64-14.1/slackware64/ap/sqlite-3.7.17-x86_64-1.txz</URL>
 <MD5>730417ec4d8158c6bb5862417107b9f4</MD5>
-</FILE>
-<FILE Name="/boot/packages/curl-7.31.0-x86_64-1.txz" Run="upgradepkg --install-new">
-<URL>http://slackware.cs.utah.edu/pub/slackware/slackware64-14.1/slackware64/n/curl-7.31.0-x86_64-1.txz</URL>
-<MD5>ce783176b2c2e1bc117917ceb4fbfbdf</MD5>
 </FILE>
 <FILE Name="/boot/packages/git-1.8.4-x86_64-1.txz" Run="upgradepkg --install-new">
 <URL>http://slackware.cs.utah.edu/pub/slackware/slackware64-14.1/slackware64/d/git-1.8.4-x86_64-1.txz</URL>
@@ -329,26 +321,26 @@ headphones_datacheck()
 headphones_updateplg()
 {
 	cd /boot/config/plugins
-	if [ -f headphones_unplugged.plg ]; then
-	[ -f headphones_unplugged.plg.old ] && rm -f headphones_unplugged.plg.old
-	mv headphones_unplugged.plg headphones_unplugged.plg.old
+	if [ -f headphones_unplugged.64bit.plg ]; then
+	[ -f headphones_unplugged.64bit.plg.old ] && rm -f headphones_unplugged.64bit.plg.old
+	mv headphones_unplugged.64bit.plg headphones_unplugged.64bit.plg.old
 	echo "Updating plugin"
-	wget -q --no-check-certificate https://github.com/sacretagent/Unplugged_64Bit_Unraid.6/raw/master/headphones_unplugged.plg
-	/usr/local/sbin/installplg /boot/config/plugins/headphones_unplugged.plg
+	wget -q --no-check-certificate https://github.com/sacretagent/Unplugged_64Bit_Unraid.6/raw/master/headphones_unplugged.64bit.plg
+	/usr/local/sbin/installplg /boot/config/plugins/headphones_unplugged.64bit.plg
 	else
 	echo "Updating plugin"
-	wget -q --no-check-certificate https://github.com/sacretagent/Unplugged_64Bit_Unraid.6/raw/master/headphones_unplugged.plg
-	/usr/local/sbin/installplg /boot/config/plugins/headphones_unplugged.plg
+	wget -q --no-check-certificate https://github.com/sacretagent/Unplugged_64Bit_Unraid.6/raw/master/headphones_unplugged.64bit.plg
+	/usr/local/sbin/installplg /boot/config/plugins/headphones_unplugged.64bit.plg
 	fi
 }
 headphones_downgradeplg()
 {
 	cd /boot/config/plugins
-	if [ -f headphones_unplugged.plg.old ]; then
-	rm -f /headphones_unplugged.plg
-	mv headphones_unplugged.plg.old headphones_unplugged.plg
+	if [ -f headphones_unplugged.64bit.plg.old ]; then
+	rm -f /headphones_unplugged.64bit.plg
+	mv headphones_unplugged.64bit.plg.old headphones_unplugged.64bit.plg
 	echo "downgrading plugin"
-	/usr/local/sbin/installplg /boot/config/plugins/headphones_unplugged.plg
+	/usr/local/sbin/installplg /boot/config/plugins/headphones_unplugged.64bit.plg
 	fi
 }
 headphones_vercheck()
