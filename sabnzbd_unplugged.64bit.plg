@@ -15,41 +15,38 @@ I have probably missed some credits here, not intentional but I do not have a pe
 -->
 
 
-<FILE Name="/boot/packages/python-2.7.3-i686-5PTr.txz" Run="upgradepkg --install-new">
-<URL>--no-check-certificate https://dl.dumptruck.goldenfrog.com/p/Vq3zpArAKB/python-2.7.3-i686-5PTr.txz?dl=1</URL>
-<MD5>644b5f3f14e76aaa5b43f01a50d8defa</MD5>
+<FILE Name="/boot/packages/python-2.7.5-x86_64-1.txz" Run="upgradepkg --install-new">
+<URL>http://slackware.cs.utah.edu/pub/slackware/slackware64-14.1/slackware64/d/python-2.7.5-x86_64-1.txz</URL>
+<MD5>9b37a33a41b263c945fddb58949386f0</MD5>
 </FILE>
-<FILE Name="/boot/packages/python-cheetah-2.4.4-i486-1alien.tgz" Run="upgradepkg --install-new">
-<URL>http://connie.slackware.com/~alien/slackbuilds/python-cheetah/pkg/13.37/python-cheetah-2.4.4-i486-1alien.tgz</URL>
-<MD5>9535ac8193f269729467357b068117aa</MD5>
+<FILE Name="/boot/packages/python-cheetah-2.4.4-x86_64-1alien.tgz" Run="upgradepkg --install-new">
+<URL>http://www.slackware.com/~alien/slackbuilds/python-cheetah/pkg64/14.1/python-cheetah-2.4.4-x86_64-1alien.tgz</URL>
+<MD5>f2e4ab251fe05c3c5e03bb5ed20b3b7a</MD5>
 </FILE>
-<FILE Name="/boot/packages/python-yenc-0.3-i486-1alien.tgz" Run="upgradepkg --install-new">
-<URL>http://connie.slackware.com/~alien/slackbuilds/python-yenc/pkg/13.37/python-yenc-0.3-i486-1alien.tgz</URL>
-<MD5>904c93692352cc2ddb8a3f769408bfad</MD5>
+<FILE Name="/boot/packages/python-yenc-0.3-x86_64-1alien.tgz" Run="upgradepkg --install-new">
+<URL>http://www.slackware.com/~alien/slackbuilds/python-yenc/pkg64/14.1/python-yenc-0.3-x86_64-1alien.tgz</URL>
+<MD5>98f9590709a0a77b656d72c33ae4639b</MD5>
 </FILE>
-<FILE Name="/boot/packages/sqlite-3.7.5-i486-1.txz" Run="upgradepkg --install-new">
-<URL>http://slackware.cs.utah.edu/pub/slackware/slackware-13.37/slackware/ap/sqlite-3.7.5-i486-1.txz</URL>
-<MD5>6786d3764cb294ecb71cdd24e6d171d1</MD5>
+<FILE Name="/boot/packages/sqlite-3.7.17-x86_64-1.txz" Run="upgradepkg --install-new">
+<URL>http://slackware.cs.utah.edu/pub/slackware/slackware64-14.1/slackware64/ap/sqlite-3.7.17-x86_64-1.txz</URL>
+<MD5>730417ec4d8158c6bb5862417107b9f4</MD5>
 </FILE>
-<FILE Name="/boot/packages/unrar-4.2.4-i486-1alien.tgz" Run="upgradepkg --install-new">
-<URL>http://www.slackware.com/~alien/slackbuilds/unrar/pkg/13.37/unrar-4.2.4-i486-1alien.tgz</URL>
-<MD5>26b4b3d9a10cb8bf7a4dd746de30e80b</MD5>
+<FILE Name="/boot/packages/unrar-4.2.4-x86_64-1alien.tgz" Run="upgradepkg --install-new">
+<URL>http://www.slackware.com/~alien/slackbuilds/unrar/pkg64/14.1/unrar-4.2.4-x86_64-1alien.tgz</URL>
+<MD5>09dbf1a095efaa1213f9a945562fbc2f</MD5>
 </FILE>
-<FILE Name="/boot/packages/infozip-6.0-i486-1.txz" Run="upgradepkg --install-new">
-<URL>http://slackware.cs.utah.edu/pub/slackware/slackware-13.37/slackware/a/infozip-6.0-i486-1.txz</URL>
-<MD5>4d59c199192a5fc4dc55089edcb66723</MD5>
+<FILE Name="/boot/packages/infozip-6.0-x86_64-2.txz" Run="upgradepkg --install-new">
+<URL>http://slackware.cs.utah.edu/pub/slackware/slackware64-14.1/slackware64/a/infozip-6.0-x86_64-2.txz</URL>
+<MD5>9fc6fcedc67a27dd555e64575847fb7b</MD5>
 </FILE>
-<FILE Name="/boot/packages/openssl-0.9.8r-i486-3.txz" Run="upgradepkg --install-new">
-<URL>http://slackware.cs.utah.edu/pub/slackware/slackware-13.37/slackware/n/openssl-0.9.8r-i486-3.txz</URL>
-<MD5>dd6ef02ebfe3e54fc54c03a52f736197</MD5>
 </FILE>
-<FILE Name="/boot/packages/pyopenssl-0.11-i486-1alien.tgz" Run="upgradepkg --install-new">
-<URL>http://connie.slackware.com/~alien/slackbuilds/pyopenssl/pkg/13.37/pyopenssl-0.11-i486-1alien.tgz</URL>
-<MD5>e02b8f7ff139e51c101721440068c455</MD5>
+<FILE Name="/boot/packages/pyopenssl-0.11-x86_64-1alien.tgz" Run="upgradepkg --install-new">
+<URL>http://www.slackware.com/~alien/slackbuilds/pyopenssl/pkg64/14.1/pyopenssl-0.11-x86_64-1alien.tgz</URL>
+<MD5>a2d3d4631868eac88708450b998ff8d4</MD5>
 </FILE>
-<FILE Name="/boot/packages/par2cmdline_tbb-0.4-i486-1kh.tgz" Run="upgradepkg --install-new">
-<URL>http://unraid-greenleaf-repository.googlecode.com/files/par2cmdline_tbb-0.4-i486-1kh.tgz</URL>
-<MD5>c5a5550888ae009531f133a33ed85be7</MD5>
+<FILE Name="/boot/packages/par2cmdline-0.4-x86_64-1alien.tgz" Run="upgradepkg --install-new">
+<URL>http://www.slackware.com/~alien/slackbuilds/par2cmdline/pkg64/14.1/par2cmdline-0.4-x86_64-1alien.tgz</URL>
+<MD5>e8f68f908496a1944040198a7e014a4c</MD5>
 </FILE>
 <FILE Name="/boot/config/plugins/sabnzbd/sabnzbd.png">
 <URL>--no-check-certificate https://github.com/downloads/W-W/unRAID/sabnzbd.png</URL>
@@ -108,7 +105,7 @@ rm /tmp/checkconfig
 <FILE Name="/boot/config/plugins/sabnzbd/plgver.txt">
 <INLINE>
 <![CDATA[
-2.6.1
+3.0.1
 ]]>
 </INLINE>
 </FILE>
@@ -403,26 +400,26 @@ sabnzbd_datacheck()
 sabnzbd_updateplg()
 {
 	cd /boot/config/plugins
-	[ -f sabnzbd_unplugged.plg.old ] && rm -f sabnzbd_unplugged.plg.old
-	if [ -f sabnzbd_unplugged.plg ]; then
-	mv sabnzbd_unplugged.plg sabnzbd_unplugged.plg.old
+	[ -f sabnzbd_unplugged.64bit.plg.old ] && rm -f sabnzbd_unplugged.64bit.plg.old
+	if [ -f sabnzbd_unplugged.64bit.plg ]; then
+	mv sabnzbd_unplugged.64bit.plg sabnzbd_unplugged.64bit.plg.old
 	echo "Updating plugin"
-	wget -q --no-check-certificate https://github.com/Influencer/UNplugged/raw/master/sabnzbd_unplugged.plg
-	/usr/local/sbin/installplg /boot/config/plugins/sabnzbd_unplugged.plg
+	wget -q --no-check-certificate https://github.com/sacretagent/Unplugged_64Bit_Unraid.6/raw/master/sabnzbd_unplugged.64bit.plg
+	/usr/local/sbin/installplg /boot/config/plugins/sabnzbd_unplugged.64bit.plg
 	else
 	echo "Updating plugin"
-	wget -q --no-check-certificate https://github.com/Influencer/UNplugged/raw/master/sabnzbd_unplugged.plg
-	/usr/local/sbin/installplg /boot/config/plugins/sabnzbd_unplugged.plg
+	wget -q --no-check-certificate https://github.com/sacretagent/Unplugged_64Bit_Unraid.6/raw/master/sabnzbd_unplugged.64bit.plg
+	/usr/local/sbin/installplg /boot/config/plugins/sabnzbd_unplugged.64bit.plg
 	fi
 }
 sabnzbd_downgradeplg()
 {
 	cd /boot/config/plugins
-	if [ -f sabnzbd_unplugged.plg.old ]; then
-	rm -f /sabnzbd_unplugged.plg
-	mv sabnzbd_unplugged.plg.old sabnzbd_unplugged.plg
+	if [ -f sabnzbd_unplugged.64bit.plg.old ]; then
+	rm -f /sabnzbd_unplugged.64bit.plg
+	mv sabnzbd_unplugged.64bit.plg.old sabnzbd_unplugged.64bit.plg
 	echo "downgrading plugin"
-	/usr/local/sbin/installplg /boot/config/plugins/sabnzbd_unplugged.plg
+	/usr/local/sbin/installplg /boot/config/plugins/sabnzbd_unplugged.64bit.plg
 	fi
 }
 sabnzbd_newver()
