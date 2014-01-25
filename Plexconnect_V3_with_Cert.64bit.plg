@@ -11,7 +11,7 @@ Ibfluencer: for the framework which i used to make this work
 PIOTRASD: for compiling the python 2.7.3 package
 
 25.01.2014
-2.0.1 - 64 bit version
+3.0.1 - 64 bit version
 1.0.6 - merged missing library and updated version
 1.0.5 - Added 2 more packages for dependencies if not installed together with Sickbeard
 1.0.4 - Specified Pythonversion
@@ -75,7 +75,7 @@ rm /tmp/PlexConnect-cleanup
 <FILE Name="/boot/config/plugins/PlexConnect/plgver.txt">
 <INLINE>
 <![CDATA[
-2.0.1
+3.0.1
 ]]>
 </INLINE>
 </FILE>
