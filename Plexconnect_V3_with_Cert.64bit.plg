@@ -42,14 +42,6 @@ I have...
 <URL>http://slackware.cs.utah.edu/pub/slackware/slackware64-14.1/slackware64/a/utempter-1.1.5-x86_64-1.txz</URL>
 <MD5>dbbe884ebb29b830e4032cc41c3f679a</MD5>
 </FILE>
-<FILE Name="/boot/packages/zlib-1.2.8-x86_64-1.txz" Run="upgradepkg --install-new">
-<URL>http://slackware.cs.utah.edu/pub/slackware/slackware64-14.1/slackware64/l/zlib-1.2.8-x86_64-1.txz</URL>
-<MD5>9c91095f98fdd2e899d46acd6bf3c482</MD5>
-</FILE>
-<FILE Name="/boot/packages/libidn-1.25-x86_64-2.txz" Run="upgradepkg --install-new">
-<URL>http://slackware.cs.utah.edu/pub/slackware/slackware64-14.1/slackware64/l/libidn-1.25-x86_64-2.txz</URL>
-<MD5>d3e815ed032f3f58adab842daa0d6a17</MD5>
-</FILE>
 <FILE Name="/boot/packages/git-1.8.4-x86_64-1.txz" Run="upgradepkg --install-new">
 <URL>http://slackware.cs.utah.edu/pub/slackware/slackware64-14.1/slackware64/d/git-1.8.4-x86_64-1.txz</URL>
 <MD5>e24d44ec30e7afc16c5509c4d9446140</MD5>
@@ -347,26 +339,26 @@ PlexConnect_datacheck()
 PlexConnect_updateplg()
 {
 	cd /boot/config/plugins
-	if [ -f Plexconnect_V3_with_Cert.plg ]; then
-	[ -f Plexconnect_V3_with_Cert.plg.old ] && rm -f Plexconnect_V3_with_Cert.plg.old
-	mv Plexconnect_V3_with_Cert.plg Plexconnect_V3_with_Cert.plg.old
+	if [ -f Plexconnect_V3_with_Cert.64bit.plg ]; then
+	[ -f Plexconnect_V3_with_Cert.64bit.plg.old ] && rm -f Plexconnect_V3_with_Cert.64bit.plg.old
+	mv Plexconnect_V3_with_Cert.64bit.plg Plexconnect_V3_with_Cert.64bit.plg.old
 	echo "Updating plugin"
-	wget -q --no-check-certificate https://raw.github.com/sacretagent/Unplugged_64Bit_Unraid.6/master/Plexconnect_V3_with_Cert.plg
-	/usr/local/sbin/installplg /boot/config/plugins/Plexconnect_V3_with_Cert.plg
+	wget -q --no-check-certificate https://raw.github.com/sacretagent/Unplugged_64Bit_Unraid.6/master/Plexconnect_V3_with_Cert.64bit.plg
+	/usr/local/sbin/installplg /boot/config/plugins/Plexconnect_V3_with_Cert.64bit.plg
 	else
 	echo "Updating plugin"
-	wget -q --no-check-certificate https://raw.github.com/sacretagent/Unplugged_64Bit_Unraid.6/master/Plexconnect_V3_with_Cert.plg
-	/usr/local/sbin/installplg /boot/config/plugins/Plexconnect_V3_with_Cert.plg
+	wget -q --no-check-certificate https://raw.github.com/sacretagent/Unplugged_64Bit_Unraid.6/master/Plexconnect_V3_with_Cert.64bit.plg
+	/usr/local/sbin/installplg /boot/config/plugins/Plexconnect_V3_with_Cert.64bit.plg
 	fi
 }
 PlexConnect_downgradeplg()
 {
 	cd /boot/config/plugins
-	if [ -f Plexconnect_V3_with_Cert.plg.old ]; then
-	rm -f /Plexconnect_V3_with_Cert.plg
-	mv Plexconnect_V3_with_Cert.plg.old Plexconnect_V3_with_Cert.plg
+	if [ -f Plexconnect_V3_with_Cert.64bit.plg.old ]; then
+	rm -f /Plexconnect_V3_with_Cert.64bit.plg
+	mv Plexconnect_V3_with_Cert.64bit.plg.old Plexconnect_V3_with_Cert.64bit.plg
 	echo "downgrading plugin"
-	/usr/local/sbin/installplg /boot/config/plugins/Plexconnect_V3_with_Cert.plg
+	/usr/local/sbin/installplg /boot/config/plugins/Plexconnect_V3_with_Cert.64bit.plg
 	fi
 }
 PlexConnect_vercheck()
