@@ -22,14 +22,6 @@ I have...
 <URL>http://slackware.cs.utah.edu/pub/slackware/slackware64-14.1/slackware64/d/python-2.7.5-x86_64-1.txz</URL>
 <MD5>9b37a33a41b263c945fddb58949386f0</MD5>
 </FILE>
-<FILE Name="/boot/packages/zlib-1.2.8-x86_64-1.txz" Run="upgradepkg --install-new">
-<URL>http://slackware.cs.utah.edu/pub/slackware/slackware64-14.1/slackware64/l/zlib-1.2.8-x86_64-1.txz</URL>
-<MD5>9c91095f98fdd2e899d46acd6bf3c482</MD5>
-</FILE>
-<FILE Name="/boot/packages/libidn-1.25-x86_64-2.txz" Run="upgradepkg --install-new">
-<URL>http://slackware.cs.utah.edu/pub/slackware/slackware64-14.1/slackware64/l/libidn-1.25-x86_64-2.txz</URL>
-<MD5>d3e815ed032f3f58adab842daa0d6a17</MD5>
-</FILE>
 <FILE Name="/boot/packages/python-cheetah-2.4.4-x86_64-1alien.tgz" Run="upgradepkg --install-new">
 <URL>http://www.slackware.com/~alien/slackbuilds/python-cheetah/pkg64/14.1/python-cheetah-2.4.4-x86_64-1alien.tgz</URL>
 <MD5>f2e4ab251fe05c3c5e03bb5ed20b3b7a</MD5>
@@ -37,10 +29,6 @@ I have...
 <FILE Name="/boot/packages/sqlite-3.7.17-x86_64-1.txz" Run="upgradepkg --install-new">
 <URL>http://slackware.cs.utah.edu/pub/slackware/slackware64-14.1/slackware64/ap/sqlite-3.7.17-x86_64-1.txz</URL>
 <MD5>730417ec4d8158c6bb5862417107b9f4</MD5>
-</FILE>
-<FILE Name="/boot/packages/curl-7.31.0-x86_64-1.txz" Run="upgradepkg --install-new">
-<URL>http://slackware.cs.utah.edu/pub/slackware/slackware64-14.1/slackware64/n/curl-7.31.0-x86_64-1.txz</URL>
-<MD5>ce783176b2c2e1bc117917ceb4fbfbdf</MD5>
 </FILE>
 <FILE Name="/boot/packages/git-1.8.4-x86_64-1.txz" Run="upgradepkg --install-new">
 <URL>http://slackware.cs.utah.edu/pub/slackware/slackware64-14.1/slackware64/d/git-1.8.4-x86_64-1.txz</URL>
