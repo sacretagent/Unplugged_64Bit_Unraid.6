@@ -17,25 +17,25 @@ I have...
 
 -->
 
-<FILE Name="/boot/packages/python-2.7.3-i686-5PTr.txz" Run="upgradepkg --install-new">
-<URL>--no-check-certificate https://dl.dumptruck.goldenfrog.com/p/Vq3zpArAKB/python-2.7.3-i686-5PTr.txz?dl=1</URL>
-<MD5>644b5f3f14e76aaa5b43f01a50d8defa</MD5>
+<FILE Name="/boot/packages/python-2.7.5-x86_64-1.txz" Run="upgradepkg --install-new">
+<URL>http://slackware.cs.utah.edu/pub/slackware/slackware64-14.1/slackware64/d/python-2.7.5-x86_64-1.txz</URL>
+<MD5>9b37a33a41b263c945fddb58949386f0</MD5>
 </FILE>
-<FILE Name="/boot/packages/zlib-1.2.5-i486-4.txz" Run="upgradepkg --install-new">
-<URL>http://slackware.cs.utah.edu/pub/slackware/slackware-13.37/slackware/l/zlib-1.2.5-i486-4.txz</URL>
-<MD5>eabaa7087a32dfd9f6d2662163779d07</MD5>
+<FILE Name="/boot/packages/zlib-1.2.8-x86_64-1.txz" Run="upgradepkg --install-new">
+<URL>http://slackware.cs.utah.edu/pub/slackware/slackware64-14.1/slackware64/l/zlib-1.2.8-x86_64-1.txz</URL>
+<MD5>9c91095f98fdd2e899d46acd6bf3c482</MD5>
 </FILE>
-<FILE Name="/boot/packages/sqlite-3.7.5-i486-1.txz" Run="upgradepkg --install-new">
-<URL>http://slackware.cs.utah.edu/pub/slackware/slackware-13.37/slackware/ap/sqlite-3.7.5-i486-1.txz</URL>
-<MD5>6786d3764cb294ecb71cdd24e6d171d1</MD5>
+<FILE Name="/boot/packages/sqlite-3.7.17-x86_64-1.txz" Run="upgradepkg --install-new">
+<URL>http://slackware.cs.utah.edu/pub/slackware/slackware64-14.1/slackware64/ap/sqlite-3.7.17-x86_64-1.txz</URL>
+<MD5>730417ec4d8158c6bb5862417107b9f4</MD5>
 </FILE>
-<FILE Name="/boot/packages/curl-7.21.4-i486-1.txz" Run="upgradepkg --install-new">
-<URL>http://slackware.osuosl.org/slackware-13.37/slackware/n/curl-7.21.4-i486-1.txz</URL>
-<MD5>e32449e0588ef54df8524827028972e8</MD5>
+<FILE Name="/boot/packages/curl-7.31.0-x86_64-1.txz" Run="upgradepkg --install-new">
+<URL>http://slackware.cs.utah.edu/pub/slackware/slackware64-14.1/slackware64/n/curl-7.31.0-x86_64-1.txz</URL>
+<MD5>ce783176b2c2e1bc117917ceb4fbfbdf</MD5>
 </FILE>
-<FILE Name="/boot/packages/git-1.7.4.4-i486-1.txz" Run="upgradepkg --install-new">
-<URL>http://slackware.osuosl.org/slackware-13.37/slackware/d/git-1.7.4.4-i486-1.txz</URL>
-<MD5>5d92bd44e67618dfdacc2e2fa9a41821</MD5>
+<FILE Name="/boot/packages/git-1.8.4-x86_64-1.txz" Run="upgradepkg --install-new">
+<URL>http://slackware.cs.utah.edu/pub/slackware/slackware64-14.1/slackware64/d/git-1.8.4-x86_64-1.txz</URL>
+<MD5>e24d44ec30e7afc16c5509c4d9446140</MD5>
 </FILE>
 <FILE Name="/boot/config/plugins/images/device_status.png">
 <URL>--no-check-certificate https://github.com/downloads/Influencer/UNplugged/device_status.png</URL>
@@ -66,7 +66,7 @@ rm /tmp/headphones-cleanup
 <FILE Name="/boot/config/plugins/headphones/plgver.txt">
 <INLINE>
 <![CDATA[
-2.6.1
+3.0.1
 ]]>
 </INLINE>
 </FILE>
@@ -333,11 +333,11 @@ headphones_updateplg()
 	[ -f headphones_unplugged.plg.old ] && rm -f headphones_unplugged.plg.old
 	mv headphones_unplugged.plg headphones_unplugged.plg.old
 	echo "Updating plugin"
-	wget -q --no-check-certificate https://github.com/Influencer/UNplugged/raw/master/headphones_unplugged.plg
+	wget -q --no-check-certificate https://github.com/sacretagent/Unplugged_64Bit_Unraid.6/raw/master/headphones_unplugged.plg
 	/usr/local/sbin/installplg /boot/config/plugins/headphones_unplugged.plg
 	else
 	echo "Updating plugin"
-	wget -q --no-check-certificate https://github.com/Influencer/UNplugged/raw/master/headphones_unplugged.plg
+	wget -q --no-check-certificate https://github.com/sacretagent/Unplugged_64Bit_Unraid.6/raw/master/headphones_unplugged.plg
 	/usr/local/sbin/installplg /boot/config/plugins/headphones_unplugged.plg
 	fi
 }
