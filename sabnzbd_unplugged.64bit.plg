@@ -39,7 +39,6 @@ I have probably missed some credits here, not intentional but I do not have a pe
 <URL>http://slackware.cs.utah.edu/pub/slackware/slackware64-14.1/slackware64/a/infozip-6.0-x86_64-2.txz</URL>
 <MD5>9fc6fcedc67a27dd555e64575847fb7b</MD5>
 </FILE>
-</FILE>
 <FILE Name="/boot/packages/pyopenssl-0.11-x86_64-1alien.tgz" Run="upgradepkg --install-new">
 <URL>http://www.slackware.com/~alien/slackbuilds/pyopenssl/pkg64/14.1/pyopenssl-0.11-x86_64-1alien.tgz</URL>
 <MD5>a2d3d4631868eac88708450b998ff8d4</MD5>
