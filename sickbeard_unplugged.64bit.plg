@@ -379,26 +379,26 @@ sickbeard_datacheck()
 sickbeard_updateplg()
 {
 	cd /boot/config/plugins
-	[ -f sickbeard_unplugged.plg.old ] && rm -f sickbeard_unplugged.plg.old
-	if [ -f sickbeard_unplugged.plg ]; then
-	mv sickbeard_unplugged.plg sickbeard_unplugged.plg.old
+	[ -f sickbeard_unplugged.64bit.plg.old ] && rm -f sickbeard_unplugged.64bit.plg.old
+	if [ -f sickbeard_unplugged.64bit.plg ]; then
+	mv sickbeard_unplugged.64bit.plg sickbeard_unplugged.64bit.plg.old
 	echo "Updating plugin"
-	wget -q --no-check-certificate https://github.com/sacretagent/Unplugged_64Bit_Unraid.6/raw/master/sickbeard_unplugged.plg
-	/usr/local/sbin/installplg /boot/config/plugins/sickbeard_unplugged.plg
+	wget -q --no-check-certificate https://github.com/sacretagent/Unplugged_64Bit_Unraid.6/raw/master/sickbeard_unplugged.64bit.plg
+	/usr/local/sbin/installplg /boot/config/plugins/sickbeard_unplugged.64bit.plg
 	else
 	echo "Updating plugin"
-	wget -q --no-check-certificate https://github.com/sacretagent/Unplugged_64Bit_Unraid.6/raw/master/sickbeard_unplugged.plg
-	/usr/local/sbin/installplg /boot/config/plugins/sickbeard_unplugged.plg
+	wget -q --no-check-certificate https://github.com/sacretagent/Unplugged_64Bit_Unraid.6/raw/master/sickbeard_unplugged.64bit.plg
+	/usr/local/sbin/installplg /boot/config/plugins/sickbeard_unplugged.64bit.plg
 	fi
 }
 sickbeard_downgradeplg()
 {
 	cd /boot/config/plugins
-	if [ -f sickbeard_unplugged.plg.old ]; then
-	rm -f /sickbeard_unplugged.plg
-	mv sickbeard_unplugged.plg.old sickbeard_unplugged.plg
+	if [ -f sickbeard_unplugged.64bit.plg.old ]; then
+	rm -f /sickbeard_unplugged.64bit.plg
+	mv sickbeard_unplugged.64bit.plg.old sickbeard_unplugged.64bit.plg
 	echo "downgrading plugin"
-	/usr/local/sbin/installplg /boot/config/plugins/sickbeard_unplugged.plg
+	/usr/local/sbin/installplg /boot/config/plugins/sickbeard_unplugged.64bit.plg
 	fi
 }
 
