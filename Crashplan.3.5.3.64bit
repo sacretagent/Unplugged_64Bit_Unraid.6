@@ -1,0 +1,414 @@
+<?xml version='1.0' standalone='yes'?>
+<PLUGIN>
+
+<!--
+The plugin provides CrashPlan support for unRAID systems.
+2011-10-17 - first release
+2011-10-23 - used symbolic links to store crashplan on disk indead of using a tar file that needed to be restored each boot
+2012-12-25 - Changed to latest crashplan installer (3.4.1), also changed install dir to default to /usr/local/crashplan)
+2014-01-26 - changed to latest linux xrashplan versio and updated cpio to 64 bit
+-->
+
+<FILE Name="/boot/packages/CrashPlan_3.5.3_Linux.tgz">
+<URL>http://download.crashplan.com/installs/linux/install/CrashPlan/CrashPlan_3.5.3_Linux.tgz</URL>
+</FILE>
+
+<FILE Name="/boot/packages/cpio-2.11-x86_64-2.txz" Run="upgradepkg --install-new">
+<URL>http://slackware.cs.utah.edu/pub/slackware/slackware64-14.1/slackware64/a/cpio-2.11-x86_64-2.txz</URL>
+<MD5>5d1f594363e10b1b7fc5b7e762a01f5e</MD5>
+</FILE>
+
+<FILE Name="/boot/config/plugins/CrashPlan/CrashPlan.png">
+<URL>http://lime-technology.com/wiki/images/5/59/Crashplan.png</URL>
+</FILE>
+
+<FILE Name="/boot/config/plugins/CrashPlan/CrashPlan.cfg">
+<INLINE>
+<![CDATA[
+# CrashPlan configuration
+SERVICE="disable"
+INSTALLDIR="/usr/local/crashplan"
+]]>
+</INLINE>
+</FILE>
+
+<FILE Name="/tmp/CrashPlan-upgrade" Run="/bin/bash">
+<INLINE>
+<![CDATA[
+#Remove currently installed plugin files
+[ -d /usr/local/emhttp/plugins/CrashPlan/ ] && rm -rf /usr/local/emhttp/plugins/CrashPlan
+
+rm /tmp/CrashPlan-upgrade
+]]>
+</INLINE>
+</FILE>
+
+<FILE Name="/usr/local/emhttp/plugins/CrashPlan/CrashPlan.png">
+<LOCAL>/boot/config/plugins/CrashPlan/CrashPlan.png</LOCAL>
+</FILE>
+
+<FILE Name="/usr/local/emhttp/plugins/CrashPlan/CrashPlan.page">
+<INLINE>
+<![CDATA[
+Menu="NetworkServices"
+Icon="CrashPlan.png"
+Version="0.3-i468-1"
+Author="SeeDrs"
+Type="php"
+Title="CrashPlan"
+]]>
+</INLINE>
+</FILE>
+
+<FILE Name="/usr/local/emhttp/plugins/CrashPlan/CrashPlan.php">
+<INLINE>
+<![CDATA[
+<?PHP
+function isCrashPlanRunning(){
+	return strstr(exec("ps -C java -o cmd h"), "CrashPlanService") ? TRUE : FALSE;
+}
+
+$CrashPlan_cfg = parse_ini_file( "/boot/config/plugins/CrashPlan/CrashPlan.cfg");
+$CrashPlan_running = isCrashPlanRunning();
+if (file_exists("/usr/local/crashplan/log/app.log")){
+	$file = file_get_contents("/usr/local/crashplan/log/app.log", false, null, -1, 2000);
+	preg_match_all("/CPVERSION.*?\s+(\d.\d.\d).*?(\d{4}-\d{2}-\d{2})/", $file, $matches);
+	$version = $matches[1][0];
+	$date = $matches[2][0];
+	preg_match_all("/ServiceModel.license.name.*?=\s+([\s\w]*?)Service/", $file, $matches);
+	$license = $matches[1][0] ? $matches[1][0] : "Not assigned.";
+	preg_match_all("/ArchiveDir.*?=\s+([\/\d\w\s]*)JavaOptions/", $file, $matches);
+	$bkpDir = $matches[1][0];
+	preg_match_all("/JVM.*?=\s+(.*?)\s+Locale/", $file, $matches);
+	$java_ver = $matches[1][0];
+}
+?>
+<fieldset style="margin-top: 10px;">
+	<legend ALIGN=LEFT>
+		<strong>Crashplan Status</strong>
+
+	</legend>
+	<table border=0>
+		<tr>
+			<td>&nbsp;</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td><? print $CrashPlan_running ? "<img src=\"/plugins/webGui/style/green-on.gif\" class=\"icon\">&nbsp;&nbsp; <strong>Running.</strong>" : 
+											  "<img src=\"/plugins/webGui/style/red-on.gif\" class=\"icon\">&nbsp;&nbsp; <strong>Stopped. </strong>"; ?>
+			</td>
+			<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td><strong>Version:</strong>&nbsp;&nbsp; </span><? print $version; ?>
+			</td>
+			<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+			<td><strong>Version Date:</strong>&nbsp;&nbsp; <? print $date; ?>
+			</td>
+		</tr>
+		<tr>
+			<td><strong>Backup Location:</strong>&nbsp;&nbsp; <? print $bkpDir; ?>
+			</td>
+			<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+			<td><strong>CrashPlan Edition:</strong>&nbsp;&nbsp; <? print $license; ?>
+			</td>
+		</tr>
+		<tr>
+			<td><strong>Java: </strong>&nbsp;&nbsp; <? print $java_ver; ?>
+			</td>
+			<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+			<td></td>
+		</tr>	
+	</table>
+</fieldset>
+<br>
+<div id='title'>
+	<span class='left'><img src='/plugins/webGui/icons/array_status.png'
+		class='icon' width='16' height='16'>CrashPlan Configuration</span>
+</div>
+<form name="CrashPlan_settings" method="POST"
+	action="/plugins/CrashPlan/CrashPlanctl.php" target="progressFrame">
+	<table class="settings">
+		<tr>
+			<td>&nbsp;</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>Enable CrashPlan:</td>
+			<td><select name="SERVICE" size="1"
+				onChange="checkRUNNING(this.form);">
+					<?=mk_option($CrashPlan_cfg['SERVICE'], "disable", "No");?>
+					<?=mk_option($CrashPlan_cfg['SERVICE'], "enable", "Yes");?>
+			</select>
+			</td>
+		</tr>
+		<tr>
+			<td>Install Directory:</td>
+			<td><input type="text" name="INSTALLDIR"
+				value="<?=$CrashPlan_cfg['INSTALLDIR'];?>">
+			</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td><? print $CrashPlan_running ? "<input type=\"submit\" name=\"cmd\" value=\"Stop\" style=\"color:#FF2400;font-weight:bold;\">":
+											  "<input type=\"submit\" name=\"cmd\" value=\"Start\" style=\"color:#52D017;font-weight:bold;\">"; ?>
+			<input type="submit" name="cmd" value="Backup">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<input type="submit" name="cmd" value="Apply">
+				<button type="button" onClick="done();">Done</button></td>
+		</tr>
+	</table>
+</form>
+</div>
+
+<script type="text/javascript">
+function checkRUNNING(form)
+{
+   if ("<?=$CrashPlan_running;?>" == "TRUE") {
+    form.INSTALLDIR.readOnly = true;
+   }
+   else {
+      form.INSTALLDIR.readOnly = (form.SERVICE.value == "enable");
+   }
+}
+
+document.CrashPlan_settings.form.BACKUPINTERVAL.value = document.CrashPlan_settings.form.BACKUPINTERVALSELECT.value;
+checkRUNNING(document.CrashPlan_settings);
+</script>
+
+]]>
+</INLINE>
+</FILE>
+
+<FILE Name="/usr/local/emhttp/plugins/CrashPlan/CrashPlanctl.php">
+<INLINE>
+<![CDATA[
+
+<?PHP
+# Some variables
+$logfile = "/var/log/plugins/crashplan.log";
+$configfile = "/boot/config/plugins/CrashPlan/CrashPlan.cfg";
+$ln = empty($_SERVER['SHELL']) ? "<br>" : PHP_EOL;
+parse_str($argv[1],$_POST);
+
+if (file_exists($configfile)){
+	$config = parse_ini_file( $configfile );
+}else{
+	write_string("", $configfile, TRUE);
+	$config = array();	
+}
+
+$settings = array();
+$settings["SERVICE"] = ($_POST['SERVICE']) ? $_POST['SERVICE'] : $config['SERVICE'];
+$settings["BACKUPINTERVAL"] = ($_POST['BACKUPINTERVAL']) ? $_POST['BACKUPINTERVAL'] : $config['BACKUPINTERVAL'];
+$settings["INSTALLDIR"] = ($_POST['INSTALLDIR']) ? $_POST['INSTALLDIR'] : $config['INSTALLDIR'];
+
+
+if ( isDefaultDir() ){
+	$backup = "/boot/config/plugins/CrashPlan/crashplan_backup.tgz";
+}else{
+	$backup = "{$settings["INSTALLDIR"]}/crashplan_backup.tgz";
+}
+
+# Declare some functions
+
+function startCrashPlan() {
+	if (! isCrashPlanRunning() ) {
+		_echo("Starting CrashPlan...");
+		exec("/usr/local/crashplan/bin/CrashPlanEngine start");
+		foreach(range(0, 10) as $numero){
+			sleep(1);
+			if (isCrashPlanRunning()){
+				break;
+			}
+		}
+		_echo("CrashPlan started.");
+	}
+}
+
+function stopCrashPlan() {
+	if ( isCrashPlanRunning() ) {
+		_echo("Stopping CrashPlan... ");
+		exec_log("/usr/local/crashplan/bin/CrashPlanEngine stop");
+		foreach(range(0, 10) as $numero){
+			sleep(1);
+			if (! isCrashPlanRunning()){
+				break;
+			}
+		}
+		_echo("CrashPlan stopped.");
+	}
+}
+
+function _echo($msg){
+	echo "$msg" . $GLOBALS['ln'];
+}
+
+function isCrashPlanRunning(){
+	return strstr(exec("ps -C java -o cmd h"), "CrashPlanService") ? TRUE : FALSE;
+}
+
+function isCrashPlanInstalled(){
+	return file_exists("/usr/local/crashplan/install.vars") ? TRUE : FALSE;
+}
+
+function isDefaultDir(){
+	global $settings;
+	return strstr($settings["INSTALLDIR"], "/usr/local/crashplan") ? TRUE : FALSE;
+}
+
+function createBackup(){
+	global $backup, $settings;
+	$initial_status = isCrashPlanRunning();
+	if ($initial_status){ stopCrashPlan(); }
+	$backupDir = isDefaultDir() ? "/var/local/crashplan" : $settings["INSTALLDIR"];
+	echo $backup;
+	exec_log( "cd $backupDir && tar -zcf \"$backup\" \"cp_bin\" \"identity\";");
+	if ($initial_status){ startCrashPlan(); }
+}
+
+function install () {
+	global $log, $backup, $settings;
+	$extractDir = isDefaultDir() ? "/var/local/crashplan" : $settings["INSTALLDIR"];
+	if ( $settings["INSTALLDIR"] ){
+		if ( (file_exists($backup)) and (! isCrashPlanInstalled()) ){
+			_echo("Installing from backup... ");
+			exec_log("rm -rf /usr/local/crashplan");
+			exec_log("rm -rf /var/lib/crashplan");
+			exec_log("[[ -z \"$extractDir\" ]] && mkdir -p \"$extractDir\";");
+			exec_log("tar -zxvf \"$backup\" -C \"$extractDir/\";");
+			exec_log("ln -s $extractDir/cp_bin /usr/local/crashplan");
+			exec_log("ln -s $extractDir/identity /var/lib/crashplan");
+		}
+		elseif  (! isCrashPlanInstalled() and ! is_file($backup) ){
+			_echo("Installing from source.");
+			exec_log("rm -rf /usr/local/crashplan");
+			exec_log("rm -rf /var/lib/crashplan");
+			exec_log("mkdir /boot/temp && tar -C /boot/temp -zxvf /boot/packages/CrashPlan_3.5.3_Linux.tgz --no-same-owner --overwrite");
+			exec_log("sed -i -r '/^more/c\\#' /boot/temp/CrashPlan-install/install.sh");
+			exec_log("sed -i -r '/^agreed=0/c\\agreed=1' /boot/temp/CrashPlan-install/install.sh");
+	
+			exec_log("cd /boot/temp/CrashPlan-install/; echo | /boot/temp/CrashPlan-install/install.sh;");
+			exec_log("rm -rf /boot/temp");
+			startCrashPlan();
+			stopCrashPlan();
+				exec_log("mkdir -p $extractDir");
+				exec_log("mv /usr/local/crashplan $extractDir/cp_bin");
+				exec_log("[[ -d /var/lib/crashplan ]] && mv /var/lib/crashplan $extractDir/identity || mkdir $extractDir/identity ");
+				exec_log("ln -s $extractDir/cp_bin /usr/local/crashplan");
+				exec_log("ln -s $extractDir/identity /var/lib/crashplan");
+
+			_echo("CrashPlan installed. Creating an initial backup file.");
+			createBackup();
+		}
+	}
+}
+
+function saveconfig() {
+	_echo("Saving Settings...");
+	global $settings, $configfile, $settings, $nl;
+	$string .= "#CrashPlan configuration\n";
+
+	foreach ($settings as $key=>$value) {
+		$string .= "$key=\"$value\"\n";
+	}
+	write_string($configfile, $string, TRUE);
+	_echo("Backup completed. ");
+}
+
+function exec_log($cmd) {
+	$results = exec($cmd);
+	write_log("\nCMD: $cmd \nResults: $results");
+}
+
+function write_log($contents) {
+	global $logfile;
+	write_string($logfile, "$contents\n", FALSE);
+}
+
+function write_string ($file, $contents, $overwrite) {
+	if (file_exists($file)) {
+		if ($overwrite)
+			unlink($file);
+		touch($file);
+	}
+
+	$fp = @fopen($file, 'a');
+	@flock($fp, LOCK_EX);
+	@fwrite($fp, $contents);
+	@flock($fp, LOCK_UN);
+	@fclose($fp);
+}
+
+#Main 
+$cur_dt = date("F j\, Y h:i:s A");
+write_log("\nStart: $cur_dt");
+
+switch ($_POST['cmd']) {
+	case 'Autostart':
+		install();
+		if ($settings['SERVICE'] == "enable") {
+			startCrashPlan();
+		}
+		break;
+	case 'Apply':
+		saveconfig();
+		break;
+	case 'Start':
+		install();
+		startCrashPlan();
+		break;
+	case 'Stop':
+		stopCrashPlan();
+		break;
+	case 'Backup':
+		createBackup();
+		break;
+	default:
+		break;
+}
+
+if (empty($_SERVER['SHELL'])) {
+	echo("<html><script>var next_page=parent.location;</script><body onload=\"parent.location=next_page\"></body></html>");
+}
+
+$cur_dt = date("F j\, Y h:i:s A");
+write_log("\nEnd: $cur_dt");
+
+?>
+]]>
+</INLINE>
+</FILE>
+
+
+<!-- event handler -->
+<FILE Name="/usr/local/emhttp/plugins/CrashPlan/event/disks_mounted" Mode="0770">
+<INLINE>
+<![CDATA[
+#!/bin/bash
+logger Starting CrashPlan.;
+/usr/bin/php /usr/local/emhttp/plugins/CrashPlan/CrashPlanctl.php "cmd=Autostart" >/dev/null 2>&1
+]]>
+</INLINE>
+</FILE>
+
+<!-- event handler -->
+<FILE Name="/usr/local/emhttp/plugins/CrashPlan/event/stopping_svcs" Mode="0770">
+<INLINE>
+<![CDATA[
+#!/bin/bash
+logger Stopping Crashplan.
+/usr/bin/php /usr/local/emhttp/plugins/CrashPlan/CrashPlanctl.php "cmd=Stop" >/dev/null 2>&1
+]]>
+</INLINE>
+</FILE>
+
+<FILE Name="/var/log/plugins/CrashPlan">
+<INLINE>
+<![CDATA[
+
+]]>
+</INLINE>
+</FILE>
+
+</PLUGIN>
