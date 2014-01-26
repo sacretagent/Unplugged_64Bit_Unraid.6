@@ -14,28 +14,14 @@ WW: Install & Data Directory size, some config page formatting.
 I have probably missed some credits here, not intentional but I do not have a perfect memory!
 -->
 
-<FILE Name="/boot/packages/curl-7.21.4-i486-1.txz" Run="upgradepkg --install-new">
-<URL>http://slackware.cs.utah.edu/pub/slackware/slackware-13.37/slackware/n/curl-7.21.4-i486-1.txz</URL>
-<MD5>e32449e0588ef54df8524827028972e8</MD5>
+<FILE Name="/boot/packages/libevent-2.0.21-x86_64-1.txz" Run="upgradepkg --install-new">
+<URL>http://slackware.cs.utah.edu/pub/slackware/slackware64-14.1/slackware64/l/libevent-2.0.21-x86_64-1.txz</URL>
+<MD5>48fe596d36a4585fc5b23ecfee09b0d3</MD5>
 </FILE>
 
-<FILE Name="/boot/packages/libevent-2.0.11-i486-1sl.txz" Run="upgradepkg --install-new">
-<URL>http://repository.slacky.eu/slackware-13.37/libraries/libevent/2.0.11/libevent-2.0.11-i486-1sl.txz</URL>
-<MD5>983db1f4445d017ba6bd3731dc63d499</MD5>
-</FILE>
-
-<FILE Name="/boot/packages/libidn-1.19-i486-1.txz" Run="upgradepkg --install-new">
-<URL>http://slackware.cs.utah.edu/pub/slackware/slackware-13.37/slackware/l/libidn-1.19-i486-1.txz</URL>
-<MD5>d412b0bd8f1f0731ec3e39702bf3a78c</MD5>
-</FILE>
-
-<FILE Name="/boot/packages/openldap-client-2.4.21-i486-1.txz" Run="upgradepkg --install-new">
-<URL>http://slackware.oregonstate.edu//slackware-13.1/slackware/n/openldap-client-2.4.21-i486-1.txz</URL>
-<MD5>330d34e3b0d896cd1033fe3eddb3b259</MD5>
-</FILE>
-
-<FILE Name="/boot/packages/transmission-2.76-i686-1PTr.txz" Run="upgradepkg --install-new">
-<URL>--no-check-certificate https://dl.dropbox.com/u/1574928/Unraid%20Plugins/transmission-2.76-i686-1PTr.txz</URL>
+<FILE Name="/boot/packages/transmission-2.82-x86_64-1sl.txz" Run="upgradepkg --install-new">
+<URL>http://ftp.arm.slackware.com/slacky/slackware64-14.1/network/transmission/2.82/transmission-2.82-x86_64-1sl.txz</URL>
+<MD5>4ebf358c2b03708414cb199a1e1fddbc</MD5>
 </FILE>
 
 <FILE Name="/boot/config/plugins/transmission/transmission.png">
@@ -142,7 +128,7 @@ rm /tmp/transmission-cleanup
 <FILE Name="/boot/config/plugins/transmission/plgver.txt">
 <INLINE>
 <![CDATA[
-1.6
+3.1
 ]]>
 </INLINE>
 </FILE>
@@ -361,26 +347,26 @@ transmission_datacheck()
 transmission_updateplg()
 {
 	cd /boot/config/plugins
-	[ -f transmission_unplugged.plg.old ] && rm -f transmission_unplugged.plg.old
-	if [ -f transmission_unplugged.plg ]; then
-	mv transmission_unplugged.plg transmission_unplugged.plg.old
+	[ -f transmission_unplugged.64bit.plg.old ] && rm -f transmission_unplugged.64bit.plg.old
+	if [ -f transmission_unplugged.64bit.plg ]; then
+	mv transmission_unplugged.64bit.plg transmission_unplugged.64bit.plg.old
 	echo "Updating plugin"
-	wget -q --no-check-certificate https://github.com/Influencer/UNplugged/raw/master/transmission_unplugged.plg
-	/usr/local/sbin/installplg /boot/config/plugins/transmission_unplugged.plg
+	wget -q --no-check-certificate https://github.com/sacretagent/Unplugged_64Bit_Unraid.6/raw/master/transmission_unplugged.64bit.plg
+	/usr/local/sbin/installplg /boot/config/plugins/transmission_unplugged.64bit.plg
 	else
 	echo "Updating plugin"
-	wget -q --no-check-certificate https://github.com/Influencer/UNplugged/raw/master/transmission_unplugged.plg
-	/usr/local/sbin/installplg /boot/config/plugins/transmission_unplugged.plg
+	wget -q --no-check-certificate https://github.com/sacretagent/Unplugged_64Bit_Unraid.6/raw/master/transmission_unplugged.64bit.plg
+	/usr/local/sbin/installplg /boot/config/plugins/transmission_unplugged.64bit.plg
 	fi
 }
 transmission_downgradeplg()
 {
 	cd /boot/config/plugins
-	if [ -f transmission_unplugged.plg.old ]; then
-	rm -f /transmission_unplugged.plg
-	mv transmission_unplugged.plg.old transmission_unplugged.plg
+	if [ -f transmission_unplugged.64bit.plg.old ]; then
+	rm -f /transmission_unplugged.64bit.plg
+	mv transmission_unplugged.64bit.plg.old transmission_unplugged.64bit.plg
 	echo "downgrading plugin"
-	/usr/local/sbin/installplg /boot/config/plugins/transmission_unplugged.plg
+	/usr/local/sbin/installplg /boot/config/plugins/transmission_unplugged.64bit.plg
 	fi
 }
 
