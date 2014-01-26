@@ -29,22 +29,6 @@ If you like my work, feel free to donate. I will NEVER require a donation or pay
 
 [DONATE](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=2679NHED2LCHG)
 
-###Downloads:
-Right click and save link as;
-
--  [Couchpotato_v2_unplugged.plg](https://github.com/influencer/unplugged/raw/master/couchpotato_v2_unplugged.plg)
--  [Sabnzbd_unplugged.plg](https://github.com/influencer/unplugged/raw/master/sabnzbd_unplugged.plg)
--  [Sickbeard_unplugged.plg](https://github.com/influencer/unplugged/raw/master/sickbeard_unplugged.plg)
--  [Headphones_unplugged.plg](https://github.com/influencer/unplugged/raw/master/headphones_unplugged.plg)
--  [Htpcmanager_unplugged.plg](https://github.com/influencer/unplugged/raw/master/htpcmanager_unplugged.plg)
--  [Darkstat-1.0_unplugged.plg](https://github.com/influencer/unplugged/raw/master/darkstat-1.0_unplugged.plg)
--  [Mylar_unplugged.plg](https://github.com/influencer/unplugged/raw/master/mylar_unplugged.plg)
--  [Maraschino_unplugged.plg](https://github.com/influencer/unplugged/raw/master/maraschino_unplugged.plg)
--  [Gamez_unplugged.plg] (https://github.com/Influencer/UNplugged/raw/master/gamez_unplugged.plg)
--  [Transmission_unplugged.plg] (https://github.com/Influencer/UNplugged/raw/master/transmission_unplugged.plg)
-
--  [Download ALL packages (zipped)] (https://github.com/Influencer/UNplugged/archive/master.zip)
-
 ###Special Thanks:
 
 To ALL that have donated. It is very appreciated! I removed individual names as the list would be getting very long,
