@@ -9,8 +9,8 @@ The plugin provides CrashPlan support for unRAID systems.
 2014-01-26 - changed to latest linux xrashplan versio and updated cpio to 64 bit
 -->
 
-<FILE Name="/boot/packages/CrashPlan_3.5.3_Linux.tgz">
-<URL>http://download.crashplan.com/installs/linux/install/CrashPlan/CrashPlan_3.5.3_Linux.tgz</URL>
+<FILE Name="/boot/packages/CrashPlan_3.6.3_Linux.tgz">
+<URL>http://download2.us.code42.com/installs/linux/install/CrashPlan/CrashPlan_3.6.3_Linux.tgz</URL>
 </FILE>
 
 <FILE Name="/boot/packages/cpio-2.11-x86_64-2.txz" Run="upgradepkg --install-new">
