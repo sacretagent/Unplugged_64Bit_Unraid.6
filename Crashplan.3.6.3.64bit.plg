@@ -22,37 +22,12 @@ The plugin provides CrashPlan support for unRAID systems.
 <URL>http://lime-technology.com/wiki/images/5/59/Crashplan.png</URL>
 </FILE>
 
-<FILE Name="/boot/config/plugins/CrashPlan/CrashPlan.cfg">
-<INLINE>
-<![CDATA[
-# CrashPlan configuration
-SERVICE="disable"
-INSTALLDIR="/usr/local/crashplan"
-]]>
-</INLINE>
-</FILE>
-
-<FILE Name="/tmp/CrashPlan-upgrade" Run="/bin/bash">
-<INLINE>
-<![CDATA[
-#Remove currently installed plugin files
-[ -d /usr/local/emhttp/plugins/CrashPlan/ ] && rm -rf /usr/local/emhttp/plugins/CrashPlan
-
-rm /tmp/CrashPlan-upgrade
-]]>
-</INLINE>
-</FILE>
-
-<FILE Name="/usr/local/emhttp/plugins/CrashPlan/CrashPlan.png">
-<LOCAL>/boot/config/plugins/CrashPlan/CrashPlan.png</LOCAL>
-</FILE>
-
 <FILE Name="/usr/local/emhttp/plugins/CrashPlan/CrashPlan.page">
 <INLINE>
 <![CDATA[
 Menu="NetworkServices"
 Icon="CrashPlan.png"
-Version="0.3-i468-1"
+Version="3.6.3-64Bit"
 Author="SeeDrs"
 Type="php"
 Title="CrashPlan"
@@ -94,8 +69,8 @@ if (file_exists("/usr/local/crashplan/log/app.log")){
 			<td></td>
 		</tr>
 		<tr>
-			<td><? print $CrashPlan_running ? "<img src=\"/plugins/webGui/style/green-on.gif\" class=\"icon\">&nbsp;&nbsp; <strong>Running.</strong>" : 
-											  "<img src=\"/plugins/webGui/style/red-on.gif\" class=\"icon\">&nbsp;&nbsp; <strong>Stopped. </strong>"; ?>
+			<td><? print $CrashPlan_running ? "<img src=\"/plugins/webGui/images/green-on.png\" class=\"icon\">&nbsp;&nbsp; <strong>Running.</strong>" : 
+											  "<img src=\"/plugins/webGui/images/red-on.png\" class=\"icon\">&nbsp;&nbsp; <strong>Stopped. </strong>"; ?>
 			</td>
 			<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
 			<td></td>
@@ -122,6 +97,20 @@ if (file_exists("/usr/local/crashplan/log/app.log")){
 		</tr>	
 	</table>
 </fieldset>
+<br>
+<fieldset style="margin-top:10px;">
+<legend ALIGN=LEFT><strong>CrashPlan Logs</strong></legend>
+<table border=0>
+	<tr>
+		<td></td>
+		<td></td>
+	</tr>
+	<tr>
+	<td><a href="/update.htm?cmd=/usr/bin/tail%20-f%20/usr/local/crashplan/log/history.log.0&forkCmd=Start" title="<?= $var[NAME]; ?> Crashplan History Log" rel="shadowbox;height=600;width=800;" id="openlog"><img src="/plugins/webGui/images/icons/page_white_text.png" width="16" height="16" style="vertical-align: middle; padding-bottom: 3px;" /> History Log</a></td>
+	<td><a href="/update.htm?cmd=/usr/bin/tail%20-f%20/usr/local/crashplan/log/restore_files.log&forkCmd=Start" title="<?= $var[NAME]; ?> Crashplan Restored Files Log" rel="shadowbox;height=600;width=800;" id="openlog"><img src="/plugins/webGui/images/icons/page_white_text.png" width="16" height="16" style="vertical-align: middle; padding-bottom: 3px;" /> Restore Log</a></td>
+	<td><a href="/update.htm?cmd=/usr/bin/tail%20-f%20/usr/local/crashplan/log/service.log.0&forkCmd=Start" title="<?= $var[NAME]; ?> Crashplan Service Log" rel="shadowbox;height=600;width=800;" id="openlog"><img src="/plugins/webGui/images/icons/page_white_text.png" width="16" height="16" style="vertical-align: middle; padding-bottom: 3px;" /> Service Log</a></td>
+	</tr>
+</table></fieldset>
 <br>
 <div id='title'>
 	<span class='left'><img src='/plugins/webGui/icons/array_status.png'
@@ -284,7 +273,7 @@ function install () {
 			_echo("Installing from source.");
 			exec_log("rm -rf /usr/local/crashplan");
 			exec_log("rm -rf /var/lib/crashplan");
-			exec_log("mkdir /boot/temp && tar -C /boot/temp -zxvf /boot/packages/CrashPlan_3.5.3_Linux.tgz --no-same-owner --overwrite");
+			exec_log("mkdir /boot/temp && tar -C /boot/temp -zxvf /boot/packages/CrashPlan_3.6.3_Linux.tgz --no-same-owner --overwrite");
 			exec_log("sed -i -r '/^more/c\\#' /boot/temp/CrashPlan-install/install.sh");
 			exec_log("sed -i -r '/^agreed=0/c\\agreed=1' /boot/temp/CrashPlan-install/install.sh");
 	
