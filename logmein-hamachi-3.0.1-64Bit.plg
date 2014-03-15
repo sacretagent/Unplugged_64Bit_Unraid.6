@@ -1,0 +1,251 @@
+<?xml version='1.0' standalone='yes'?>
+<PLUGIN>
+
+<!--
+2014-03-15 - 64 bit upgrade but still shitty interface 
+2011-09-04 - first release
+
+LogMeIn Hamachi Plugin
+
+-->
+<!-- clean up previous install -->
+<FILE Name="/tmp/cleanup" Run="/bin/bash">
+<INLINE>
+<![CDATA[
+
+rm -r /boot/config/plugins/logmein-hamachi
+rm -r /usr/local/emhttp/plugins/logmein-hamachi
+rm -f /usr/local/emhttp/plugins/webGui/UserApps.page
+
+rm /tmp/cleanup
+]]>
+</INLINE>
+</FILE>
+
+<!-- Icon File -->
+<FILE Name="/boot/config/plugins/logmein-hamachi/hamachi-logo.png">
+<URL>http://dl.dropbox.com/u/8699829/hamachi-logo.png</URL>
+</FILE>
+
+<!-- Install LogMeIn Hamachi -->
+
+<FILE Name="/boot/config/plugins/logmein-hamachi/hamachi-2.1.0.119-X64-unRAID.txz" Run="upgradepkg --install-new">
+<URL>--no-check-certificate https://dl.dropboxusercontent.com/u/29067424/hamachi-2.1.0.119-X64-unRAID.txz</URL>
+</FILE>
+
+<!-- Create Hamachi Config File -->
+<FILE Name="/boot/config/plugins/logmein-hamachi/hamachi.cfg">
+<INLINE>
+<![CDATA[
+# LogMeIn Hamachi configuration
+ACCOUNT=""
+NICKNAME="Tower"
+]]>
+</INLINE>
+</FILE>
+
+<!-- Save Configuration File -->
+<FILE Name="/boot/config/plugins/logmein-hamachi/apply"  Mode="0770">
+<INLINE>
+<![CDATA[
+#!/bin/sh
+
+write_config() {
+  echo "# LogMeIn Hamachi configuration" > /boot/config/plugins/logmein-hamachi/hamachi.cfg
+  echo "ACCOUNT=\"$ACCOUNT\"" >> /boot/config/plugins/logmein-hamachi/hamachi.cfg
+  echo "NICKNAME=\"$NICKNAME\"" >> /boot/config/plugins/logmein-hamachi/hamachi.cfg
+}
+apply_hamachi_config() {
+  hamachi set-nick $NICKNAME
+  hamachi attach $ACCOUNT
+}
+
+ACCOUNT=$1
+NICKNAME=$2
+
+write_config
+apply_hamachi_config
+
+]]>
+</INLINE>
+</FILE>
+
+<!-- Create WebGui PHP Page -->
+<FILE Name="/usr/local/emhttp/plugins/logmein-hamachi/logmein-hamachi.php">
+<INLINE>
+<![CDATA[
+<form method="get" name="cform1">
+	<table border=0>
+		<tr><td></td><td></td></tr>
+<?php
+	parse_str(str_replace("+","%2B",$argv[1]), $_GET);
+
+	if ($_GET["act"] == "Stop") {
+		$stop = shell_exec("/etc/rc.d/rc.hamachi stop");
+		echo $stop;
+	}
+
+	if ($_GET["act"] == "Start") {
+		$start = shell_exec("/etc/rc.d/rc.hamachi start");
+		echo $start;
+		
+	}
+
+	
+	//*****************************************************
+	//* Find all ports in use
+	//*****************************************************
+		$data = shell_exec('netstat -n -l -p');
+		$pat = '/\d*\.\d*\.\d*\:(\d*)/' ;
+		//preg_match_all($pat, $data, $ports);
+
+		$lines = explode("\n",$data);
+		
+		$hamachi_running=0;
+		$hamachi_port=0;
+		foreach ($lines as $dat) {
+			ereg('[0-9]{1,6}\.[0-9]{1,6}\.[0-9]{1,6}\.[0-9]{1,6}\:([0-9]{1,6})[^/]*/(.*)', $dat, $p);
+			$ports[] = array($p[1], trim($p[2]));
+			if (trim($p[2]) == "hamachid") {
+				$hamachi_running=1;
+				$hamachi_port = $p[1];
+			}
+		}
+
+		$stg = "";
+		$allports="";
+		$usedports="";
+		$badports="";
+		foreach ($ports as $d) {
+			$allports .= "|" . $d[1];
+			if (strlen($d[0]) >0 && $d[0]>=80 && $d[0] <=99) {
+				$usedports .=  $d[0] . ' (' . $d[1] . ')<br>';
+				if ($d[1] != "java") {
+					$badports  .=  $d[0] . ' (' . $d[1] . ')<br>';
+				}
+			}
+		}
+
+	//*****************************************************
+	//* Is Hamachi installed and running?
+	//*****************************************************
+      $file = '/etc/rc.d/rc.hamachi';
+      $stop_button  = '<input type="submit" name="act" value="Stop">';
+      $start_button = '<input type="submit" name="act" value="Start">';
+      $backup_button = '<input type="submit" name="act" value="Save">';
+      $history_button = '<input type="submit" name="act" value="History">';
+      if (file_exists($file)) {
+				table("LogMeIn Hamachi appears to be installed in", $file);
+				if ( $hamachi_running ==  1) {
+
+					table("Hamachi is running", $stop_button);
+				} else {
+					table("Hamachi is not running", $start_button);
+				}
+
+      } else {
+				table("LogMeIn Hamachi does not appear to be installed","(looked in $file)");
+      }
+  	  
+      echo("</table></form>");
+?>
+<?
+
+function table($v1, $v2) {
+echo('<tr VALIGN=TOP><td>' . $v1 . ':</td><td>' . $v2 . '</td</tr>');
+}
+function table2($v3) {
+echo('<tr VALIGN=TOP><td>' . $v3 . '</td></tr>');
+}
+?>
+
+<?PHP
+$lines = file('/var/lib/logmein-hamachi/h2-engine.ini');
+$l_count = count($lines);
+for($x = 0; $x< $l_count; $x++)
+$hamachi_cfg = parse_ini_file( "/boot/config/plugins/logmein-hamachi/hamachi.cfg");
+?>
+
+<fieldset style="margin-top:10px;">
+<legend ALIGN=LEFT><strong>Hamachi Configuration</strong></legend>
+      <table>
+   <form name="hamachi_settings" method="POST" action="/update.htm" target="progressFrame">
+      <input type="hidden" name="cmd" value="/boot/config/plugins/logmein-hamachi/apply">
+      <table class="settings">
+         <tr>
+         <td>LogMeIn Account:</td>
+         <td><input type="text" name="arg1" maxlength="30" value=" <? print substr($lines['8'],21); ?>"></td>
+         </tr>
+         <tr>
+         <td>Nickname:</td>
+         <td><input type="text" name="arg2" maxlength="30" value=" <? print substr($lines['10'],21); ?>"></td>
+         </tr>
+         <tr>
+         <td></td>
+         <td><input type="submit" name="runCmd" value="Apply"><button type="button" onClick="done();">Done</button></td>
+         </tr>
+      </table>
+   </form>
+</fieldset>
+]]>
+</INLINE>
+</FILE>
+
+<!-- Build WebGui Page -->
+<FILE Name="/usr/local/emhttp/plugins/logmein-hamachi/logmein-hamachi.page">
+<INLINE>
+<![CDATA[
+Menu="UserApps"
+Icon="hamachi-logo.png"
+Version="1.0.2"
+Author="Chris Leight"
+Type="php"
+Title="LogMeIn Hamachi"
+]]>
+</INLINE>
+</FILE>
+
+<!-- Build User Applications Page, if it doesn't exist -->
+<FILE Name="/usr/local/emhttp/plugins/webGui/UserApps.page">
+<INLINE>
+<![CDATA[
+Author="LimeTech"
+Version="1.0.0"
+Title="User Applications"
+Menu="Utils"
+Type="menu"
+]]>
+</INLINE>
+</FILE>
+
+<!-- Build Icon File in /usr/local/emhttp/... -->
+<FILE Name="/usr/local/emhttp/plugins/logmein-hamachi/hamachi-logo.png" Mode="0770">
+<LOCAL>/boot/config/plugins/logmein-hamachi/hamachi-logo.png</LOCAL>
+</FILE>
+
+<!--
+Here are a couple "event handler" scripts.  These scripts are created in the "event" directory of
+the webGui plugin.  They are invoked automatically by emhttp when the corresponding event occurs.
+In the case of slimserve, the "disk_mounted" event is used to start the server; and the "unmounting_disks"
+even is used to stop the server.  We use the Mode attribute to make these scripts executable.
+-->
+<FILE Name="/usr/local/emhttp/plugins/logmein-hamachi/event/disks_mounted" Mode="0770">
+<INLINE>
+<![CDATA[
+#!/bin/bash
+/etc/rc.d/rc.hamachi start
+]]>
+</INLINE>
+</FILE>
+
+<!-- Event Handler -->
+<FILE Name="/usr/local/emhttp/plugins/logmein-hamachi/event/unmounting_disks" Mode="0770">
+<INLINE>
+<![CDATA[
+#!/bin/bash
+/etc/rc.d/rc.hamachi stop
+]]>
+</INLINE>
+</FILE>
+
+</PLUGIN>
