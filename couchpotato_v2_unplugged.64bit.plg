@@ -311,7 +311,7 @@ source /boot/config/plugins/couchpotato_v2/couchpotato_v2.cfg
 	fi	
 	
 	cd /tmp
-	git clone -b $BRANCH $INSTALLURL CouchPotatoServer
+	git clone -b $BRANCH $INSTALLURL Couchpotato
 	cp -Rfu /tmp/CouchPotatoServer/. $INSTALLDIR
 	rm -Rf /tmp/CouchPotatoServer
 	
@@ -462,7 +462,7 @@ esac
 <![CDATA[
 Menu="unplugged"
 Icon="couchpotato_v2.png"
-Version="2.3.1"
+Version="3.0.2"
 Author="Wojciech Walaszek; Influencer; Benjamin Waller"
 Type="php"
 Title="CouchPotato v2"
