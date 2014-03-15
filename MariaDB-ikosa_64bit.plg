@@ -1,0 +1,741 @@
+<?xml version='1.0' standalone='yes'?>
+<PLUGIN>
+
+<!--
+2011-10-05 - First release, screen is required so the web page does not hang when starting the service.
+
+2011-10-07 - Fixed permissions issues
+
+2011-10-07 - Hardcoded initial password for root account. The password is "root" (without quotes)
+
+2011-10-10 - Rewrite bash apply script into php. This eliminated the requirements for screen when starting the mysql service. Also implimented some loggong.
+
+2011-10-27 - If my.cf exist in /boot/config/plugins/mysql, it will be copied to /etc and used instead of using /etc/my-medium.cnf
+
+2011-10-29 - Corrected typo. my.cf should be my.cnf for custom config
+
+2012-04-23 - Andrew Hamer-Adams: Updated to MySQL 5.5.22. Changed config to relect new MySQL rc.d changes. Upgraded gui & added log files.
+
+2012-06-03 - p1lot: Updated to MySQL 5.5.24
+
+2012-07-06 - p1lot: Updated to MySQL 5.5.25
+
+2012-07-12 - p1lot: DATADIR now is has permissions mysql:users in order to avoid permission issues. LibAIO-Link updated to Slackware 13.37 repos, but it's the same as the 13.1-package.
+
+2012-10-05 - p1lot: Socket fix (/tmp/mysql.sock links to /var/run/mysql/mysql.sock) and updated to 5.5.28
+
+2013-01-12 - thedude459: upgraded to 5.5.29
+
+2013-02-27 - CHBMB: upgraded to 5.5.30
+
+2013-09-03 - Ikosa: my.cnf chmod fix, plg update feature added, start/restart/stop controls added, my.conf typo fix, filename changed to a static one for easy update, .page version changed to plugin version for maintance, all contributers added to authors.
+
+2013-09-09 - Ikosa: Automated & manual backup features added. Some minor fixes. 
+
+2013-09-13 - Ikosa: Fix not starting on reboot. 
+
+2013-09-13 - Ikosa: Fix for clearing new values of cfg file on reboot. 
+
+2013-01-12 - Ikosa: A suspicious line about permissions (which comes from the original plg) removed.
+
+2013-01-12 - Ikosa: mysql package link changed
+
+2014-03-15 - 64bit MariaDB release
+
+The plugin provides mysql support for unRAID systems.
+
+-->
+
+<!--install mysql-->
+<FILE Name="/boot/packages/mariadb-5.5.35-x86_64-1_slack14.1.txz" Run="upgradepkg --install-new">
+<URL>http://slackware.cs.utah.edu/pub/slackware/slackware64-14.1/patches/packages/mariadb-5.5.35-x86_64-1_slack14.1.txz</URL>
+<MD5>08890b91bb6e2db66c501a7a10e936a7</MD5>
+</FILE>
+
+<!--install Libaio-->
+<FILE Name="/boot/packages/libaio-0.3.109-x86_64-1.txz" Run="upgradepkg --install-new">
+<URL>http://slackware.cs.utah.edu/pub/slackware/slackware64-14.1/slackware64/l/libaio-0.3.109-x86_64-1.txz</URL>
+<MD5>8f1a4263ca82e02bed4d2930447fd6fa</MD5>
+</FILE>
+
+<FILE Name="/boot/config/plugins/mysql/mysql.png">
+<URL>http://lime-technology.com/wiki/images/d/d3/Mysql.png</URL>
+</FILE>
+
+<FILE Name="/boot/config/plugins/mysql/mysql.cfg">
+<INLINE>
+<![CDATA[
+# mysql configuration
+SERVICE="disable"
+DATADIR="/mnt/user/mysql"
+BACKUP="disable"
+BACKUPDIR="/mnt/user/backups/mysql"
+BACKUP_USERNAME="root"
+BACKUP_PASS="root"
+SEND_MAIL="enable"
+MAIL_TO="root"
+BACKUP_MIN_SIZE="1500000"
+]]>
+</INLINE>
+</FILE>
+
+
+<FILE Name="/tmp/mysql-upgrade" Run="/bin/bash">
+<INLINE>
+<![CDATA[
+#Remove currently installed plugin files and old logs
+[ -f /var/log/plugins/mysql ] && rm /var/log/plugins/mysql
+[ -d /usr/local/emhttp/plugins/mysql/ ] && rm -rf /usr/local/emhttp/plugins/mysql
+[ -f /etc/rc.d/rc.ikosa ] && rm /etc/rc.d/rc.ikosa
+[ -f /boot/config/plugins/mysql/mysql_cron.sh ] && rm /boot/config/plugins/mysql/mysql_cron.sh
+[ -f /boot/config/plugins/mysql/mysql_backup.sh ] && rm /boot/config/plugins/mysql/mysql_backup.sh
+
+rm /tmp/mysql-upgrade
+]]>
+</INLINE>
+</FILE>
+
+
+<FILE Name="/boot/config/plugins/mysql/mysql_backup.sh">
+<INLINE>
+<![CDATA[
+#!/bin/bash
+source /boot/config/plugins/mysql/mysql.cfg
+now=$(date +%"Y_%m_%d-%H_%M")
+
+echo "Automated MySQL Backup Started..." | logger -t mysql_backup
+if [ ! -d $BACKUPDIR ]; then
+	echo "Backup directory not exists, creating directory..." | logger -t mysql_backup
+	mkdir $BACKUPDIR
+	echo "Directory created." | logger -t mysql_backup
+else
+	echo "Backup directory exists..." | logger -t mysql_backup
+fi
+echo "Performing backup..." | logger -t mysql_backup
+mysqldump -u $BACKUP_USERNAME -p$BACKUP_PASS --all-databases --single-transaction | gzip -9 > "$BACKUPDIR"/mysqlbackup_$now.sql.gz
+echo "Backup complete." | logger -t mysql_backup
+
+check_file()
+{
+	echo "Checking backup file..." | logger -t mysql_backup
+	if [ -f "$BACKUPDIR"/mysqlbackup_$now.sql.gz ]; then
+		echo "...OK." | logger -t mysql_backup
+	else
+		echo "File not found or corrupt!" | logger -t mysql_backup
+		if [ $SEND_MAIL = "enable" ] && [ -f /usr/sbin/ssmtp ]; then
+			echo -e "From: \"Mysql Backup\"\nSubject: Error\n\nMysql backup error: \"File not found or corrupt!\" mysqlbackup_$now.sql.gz" | ssmtp -d $MAIL_TO > /dev/null 2>&1
+			echo "Mail send to $MAIL_TO." | logger -t mysql_backup
+		fi
+	fi
+}
+
+check_file_size()
+{
+	if [ -f "$BACKUPDIR"/mysqlbackup_$now.sql.gz ]; then
+		SIZE=$(du -sb "$BACKUPDIR"/mysqlbackup_$now.sql.gz | awk '{ print $1 }')
+		if ((SIZE<$BACKUP_MIN_SIZE)); then 
+			echo "Warning: Backup file size too small!" | logger -t mysql_backup
+			if [ $SEND_MAIL = "enable" ] && [ -f /usr/sbin/ssmtp ]; then
+				echo -e "From: \"Mysql Backup\"\nSubject: Error\n\nMysql backup error: \"File not found or corrupt!\" mysqlbackup_$now.sql.gz" | ssmtp -d $MAIL_TO > /dev/null 2>&1
+				echo "Mail send to $MAIL_TO." | logger -t mysql_backup
+			fi
+		else
+			echo "File size OK." | logger -t mysql_backup
+			if [ $SEND_MAIL = "enable" ] && [ -f /usr/sbin/ssmtp ]; then
+				echo -e "From: \"Mysql Backup\"\nSubject: Success\n\nMysql backup successful mysqlbackup_$now.sql.gz" | ssmtp -d $MAIL_TO > /dev/null 2>&1
+				echo "Mail send to $MAIL_TO." | logger -t mysql_backup
+			fi
+		fi
+	fi
+}
+
+  case "$SEND_MAIL" in
+	'disable')
+		check_file
+	;;
+	'error')
+		check_file
+		check_file_size
+	;;
+	'enable')
+		check_file
+		check_file_size
+	;;
+  esac
+]]>
+</INLINE>
+</FILE>
+
+
+<FILE Name="/boot/config/plugins/mysql/mysql_cron.sh" Run="/bin/bash">
+<INLINE>
+<![CDATA[
+#!/bin/bash
+#load plugin config
+source /boot/config/plugins/mysql/mysql.cfg
+
+cmd=$"$BACKUP_HOUR$BACKUP_FREQUENCY /boot/config/plugins/mysql/mysql_backup.sh"
+
+# Create cron job if enabled
+if [ "$BACKUP" = "enable" ]; then
+  echo "adding $cmd to crontab"
+  cron=/tmp/mysql_backup.tmp
+  crontab -l | grep -vi 'Automated MySQL Backup' | grep -v 'mysql_backup.sh' > $cron
+  echo '# Automated MySQL Backup' >> $cron
+  echo "$cmd" >> $cron
+  crontab $cron
+  rm -f $cron
+else
+  echo "Automated backup disabled skipping cron entry"
+fi
+]]>
+</INLINE>
+</FILE>
+
+<FILE Name="/usr/local/emhttp/plugins/mysql/mysql.png">
+<LOCAL>/boot/config/plugins/mysql/mysql.png</LOCAL>
+</FILE>
+
+<FILE Name="/usr/local/emhttp/plugins/mysql/mysql.page">
+<INLINE>
+<![CDATA[
+Menu="NetworkServices"
+Icon="mysql.png"
+Version="0.2.3"
+Author="SeeDrs, p1lot, thedude459, CHBMB, Ikosa"
+Type="php"
+Title="MySQL Server"
+]]>
+</INLINE>
+</FILE>
+
+<FILE Name="/usr/local/emhttp/plugins/mysql/mysql.php">
+<INLINE>
+<![CDATA[
+
+<?PHP
+
+$mysql_cfg = parse_ini_file( "/boot/config/plugins/mysql/mysql.cfg");
+$mysql_running = file_exists( "/var/run/mysql/mysql.pid") ? "yes" : "no";
+?>
+<body onload="disableAutoBackup(); disableMail();">
+<style>
+.green {
+	color: #6FA239;
+	font-size: 14px;
+}
+.red {
+	color: #CC3300;
+	font-size: 14px;
+}
+</style>
+<div name="one">
+   <form name="mysql_settings" method="POST" action="/plugins/mysql/mysqlctl.php" target="progressFrame">
+      <table class="settings">
+         <tr>
+         <td>Enable MySQL:</td>
+         <td><select name="SERVICE" size="1" id="service" onChange="checkRUNNING(this.form);">
+            <?=mk_option($mysql_cfg['SERVICE'], "disable", "No");?>
+            <?=mk_option($mysql_cfg['SERVICE'], "enable", "Yes");?>
+            </select></td>
+         </tr>
+         <tr>
+         <td>Data Directory:</td>
+         <td><input type="text" name="DATADIR" id="datadir" value="<?=$mysql_cfg['DATADIR'];?>"></td>
+         </tr>
+         <tr>
+         <td>Initial Root Password:</td>
+         <td>root</td>
+         </tr>
+           <tr>
+         <td></td>
+         <td></td>
+         </tr>
+      </table>
+</div>
+<div id="title"><span class="left">Backup</span></div> 
+<div name="bakcup">
+		<table class="settings">
+			<tr><td>Enable Automated Backup:</td>
+				<td><select name="BACKUP" id="arg1" size="1"  onChange="disableAutoBackup();">
+						<?=mk_option($mysql_cfg['BACKUP'], "disable", "No");?>
+						<?=mk_option($mysql_cfg['BACKUP'], "enable", "Yes");?>
+					</select>
+				</td>
+			</tr>
+			<tr><td>Backup Frequency:</td>
+				<td><select name="BACKUP_FREQUENCY" id="arg2" size="1">
+						<?=mk_option($mysql_cfg['BACKUP_FREQUENCY'], " * * * ", "Daily");?>
+						<?=mk_option($mysql_cfg['BACKUP_FREQUENCY'], " * * 1 ", "Weekly");?>
+						<?=mk_option($mysql_cfg['BACKUP_FREQUENCY'], " 1 * * ", "Montly");?>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td>Backup Time:</td>
+				<td><select name="BACKUP_HOUR" id="arg3" size="1">
+							<?for ($h=0; $h<24; $h++):?>
+								<?=mk_option($mysql_cfg['BACKUP_HOUR'], sprintf("0 %d", $h), sprintf("%02d:00", $h))?>
+								<?=mk_option($mysql_cfg['BACKUP_HOUR'], sprintf("30 %d",$h), sprintf("%02d:30", $h))?>
+							<?endfor;?>
+					</select>
+				</td>			
+			</tr>
+			<tr><td>Backup Directory:</td><td><input type="text" name="BACKUPDIR" id="arg4" value="<?=$mysql_cfg['BACKUPDIR'];?>"></td></tr>
+			<tr><td>Username:</td><td><input type="text" name="BACKUP_USERNAME" id="arg5" value="<?=$mysql_cfg['BACKUP_USERNAME'];?>"></td></tr>
+			<tr><td>Password:</td><td><input type="password" name="BACKUP_PASS" id="arg6" value="<?=$mysql_cfg['BACKUP_PASS'];?>"></td></tr>
+			<tr><td>Send Mail After Backup:</td>
+				<td><select name="SEND_MAIL" size="1" id="arg7" onChange="disableMail();">
+						<?=mk_option($mysql_cfg['SEND_MAIL'], "disable", "No");?>
+						<?=mk_option($mysql_cfg['SEND_MAIL'], "error", "Just Errors");?>
+						<?=mk_option($mysql_cfg['SEND_MAIL'], "enable", "Yes");?>
+					</select>
+					<?if ($mysql_cfg['SEND_MAIL'] != "disable"):?>
+						<?$ssmtp_installed = is_file("/usr/sbin/ssmtp") ? yes : no;?>
+						<?if ($ssmtp_installed=="yes"):?>
+							<span class="green"><b>&#10004</b> ssmtp is installed</span>
+						<?else:?>
+							<span class="red"><b>&#10008</b> ssmtp is not installed, required for this funtion!</span>
+						<?endif;?>
+					<?endif;?>
+				</td>
+			</tr>
+			<tr><td>Send Mail to:</td><td><input type="text" name="MAIL_TO" id="arg8" value="<?=$mysql_cfg['MAIL_TO'];?>"></td></tr>
+			<tr><td>Min File Size to Warn:</td><td><input type="text" name="BACKUP_MIN_SIZE" id="arg9" value="<?=$mysql_cfg['BACKUP_MIN_SIZE'];?>"></td></tr>
+			<tr><td></td><td><input type="submit" name="cmd" value="Save"> <input type="submit" name="cmd" value="Apply"> <input type="submit" name="cmd" title="Uses parameters above! Save them before running backup!" value="Backup Now"> <button type="button" onClick="done();">Done</button></td></tr>
+		</table>
+	</form>
+ 
+</div>
+   <div id="title"><span class="left">Status: 
+   
+   <? if ($mysql_running=="yes") { ?>
+
+     <span class="green">Running</span>
+
+<? } else { ?>
+   
+   <span class="red">Stopped</span>
+   
+   <?php } ?>
+   </span></div>
+   <?$mysql_localplg=shell_exec("/etc/rc.d/rc.ikosa getver mysql local");?>
+   <?$mysql_remoteplg=shell_exec("/etc/rc.d/rc.ikosa getver mysql remote");?>
+ <div name="two">
+	<form name="mysql_settings" method="POST" action="/plugins/mysql/mysqlctl.php" target="progressFrame">
+		  <table class="settings">
+			 <tr>
+			 <td>MySQL Plugin Version:</td>
+			 <?if ($mysql_localplg != "" AND $mysql_localplg != "Unknown" AND $mysql_localplg != $mysql_remoteplg):?>
+			 <td>New version (<?=$mysql_remoteplg?>) is available <input type="submit" name="cmd" value="Update Plg"></td>
+			 <?else:?>
+			 <td>Plugin is up to date</td>
+			 <?endif;?>
+			 </tr>
+			 <tr>
+			 <td>MySQL Server Version:</td>
+			 <td><?php echo exec('/usr/bin/mysql -V'); ?></td>
+			 </tr>
+			 <tr>
+			 <td>Configuration Location:</td>
+			 <td>/etc/my.cnf</td>
+			 </tr>
+			 <tr>
+			 <td>Control Actions:</td>
+			 <?if ($mysql_running==yes):?>
+			 <td><input type="submit" name="cmd" value="Restart"><input type="submit" name="cmd" value="Stop"></td>
+			 <?else:?>
+			 <td><input type="submit" name="cmd" value="Start"></td>
+			 <?endif;?>
+		  </table>
+	</form>
+ </div>
+
+
+
+<div id="title"><span class="left">Log Files</span></div> 
+<div name="four">
+    <table class="share_status wide">
+    <tr>
+         <td>Filename</td>
+         <td>Size</td>
+         </tr>
+    <?php
+foreach (glob("".$mysql_cfg['DATADIR']."/*.err") as $log) {
+         echo "<tr>
+         <td><a id=\"openlog\" rel=\"shadowbox;height=600;width=800;\" title=\"".$log."\" href=\"/update.htm?cmd=/usr/bin/tail%20-n%201000%20-f%20".$log."&forkCmd=Start\">".$log."</a></td>
+         <td>".filesize($log)."</td>
+         </tr>";
+}
+?>
+  </table>
+  </div>
+<script type="text/javascript">
+function checkRUNNING(form)
+{
+   if ("<?=$mysql_running;?>" == "yes") {
+    form.datadir.disabled = true;
+   }
+   else {
+      form.datadir.disabled = (form.service.value == "enable");
+   }
+}
+
+function disableAutoBackup()
+{
+   if (document.getElementById('arg1').value == "enable") {
+		document.getElementById('arg2').disabled = false;
+		document.getElementById('arg3').disabled = false;
+   }
+   else {
+		document.getElementById('arg2').disabled = true;
+		document.getElementById('arg3').disabled = true;
+   }
+}
+
+function disableMail()
+{
+   if (document.getElementById('arg7').value == "disable") {
+		document.getElementById('arg8').disabled = true;
+		document.getElementById('arg9').disabled = true;
+   }
+   else {
+		document.getElementById('arg8').disabled = false;
+		document.getElementById('arg9').disabled = false;
+   }
+}
+checkRUNNING(document.mysql_settings);
+</script>
+
+]]>
+</INLINE>
+</FILE>
+
+
+<FILE Name="/usr/local/emhttp/plugins/mysql/mysqlctl.php">
+<INLINE>
+<![CDATA[
+<?PHP
+  $logfile = "/var/log/plugins/mysql";
+  $configfile = "/boot/config/plugins/mysql/mysql.cfg";
+
+  if (empty($_SERVER['SHELL']))
+    $newline = "<br>";
+  else
+    $newline = "\n";
+
+  $cur_dt = date("F j\, Y h:i:s A");
+  write_log("\nStart: $cur_dt");
+  
+  $settings = array(
+    "SERVICE",
+    "DATADIR",
+	"BACKUP",
+	"BACKUP_FREQUENCY",
+	"BACKUP_HOUR",
+	"BACKUPDIR",
+	"BACKUP_USERNAME",
+	"BACKUP_PASS",
+	"SEND_MAIL",
+	"MAIL_TO",
+	"BACKUP_MIN_SIZE",
+  );
+
+  parse_str($argv[1],$_POST);
+
+  $SERVICE=$_POST['SERVICE'];
+  $DATADIR=$_POST['DATADIR'];
+
+  write_log("SERVICE: $SERVICE\nDATADIR: $DATADIR");
+
+  switch ($_POST['cmd']) {
+    case 'Apply':
+      saveconfig();
+      
+      if ($SERVICE == "enable") {
+        applyconfig();
+        startmysql();
+      }
+      else
+        stopmysql();
+      
+      break;
+     case 'Start':
+      startmysql();
+	  break;
+    case 'Stop':
+	  stopmysql();
+      break;
+	case 'Restart':
+	  stopmysql();
+	  sleep(10);
+	  startmysql();
+      break;
+    case 'enable':
+      break;
+	case 'Update Plg':
+	  updateplg();
+	  break;
+    case 'disable':
+      break;
+	case 'Save':
+	  saveconfig();
+	  break;
+	case 'Backup Now':
+	  run_backup();
+	  break;
+    default:
+    break;
+  }
+
+  if (empty($_SERVER['SHELL'])) {
+    echo("<html>");
+    echo("<head><script>var goback=parent.location;</script></head>");
+    echo("<body onLoad=\"parent.location=goback;\"></body>");
+    echo("</html>");
+  }
+  
+  $cur_dt = date("F j\, Y h:i:s A");
+  write_log("\nEnd: $cur_dt");
+  
+  function startmysql() {
+    global $newline, $log, $DATADIR;
+
+    echo("Starting MySQL...");
+    exec_log("/etc/rc.d/rc.mysql start --user=mysql");
+ 
+    if (file_exists("$DATADIR/.rootpasswordset")) {
+        echo("...root password already set...");
+    }
+    else {
+      echo("...Setting initiral root password...");
+      sleep(10);
+      exec_log("mysqladmin -u root password root");
+      exec_log("mysql -u root --password=root -e \"GRANT ALL PRIVILEGES ON *.* TO root@'%' IDENTIFIED BY 'root' WITH GRANT OPTION;\"");
+      touch("$DATADIR/.rootpasswordset");
+    }
+	
+	exec_log("ln -s /tmp/mysql.sock /var/run/mysql/mysql.sock");
+
+    echo("Completed$newline");
+
+  }
+  
+  function stopmysql() {
+    global $newline, $log;
+
+    echo("Stopping MySQL...");
+    exec_log("/etc/rc.d/rc.mysql stop --user=mysql");
+    echo("Completed$newline");
+  }
+  
+  function applyconfig() {
+    echo("Applying Settings...");
+ 
+    global $SERVICE, $DATADIR, $newline, $log;
+    
+    exec_log("mkdir -p $DATADIR");
+ 
+    exec_log("grep ^mysql /etc/passwd");
+    
+    //create mysql user if required
+    if ($results == "") {
+      exec_log("useradd -r -g users -d / -s /bin/false mysql &> /dev/null");
+      exec_log("cp /etc/passwd /etc/shadow /boot/config");
+    }
+	
+    //add mysql to the users group
+    exec_log("usermod -a -G users mysql");
+   
+    //fix permissions of data directory
+    exec_log("chown -hR mysql:users $DATADIR");
+    exec_log("chmod -R go-rwx,u-x,g+u,ug+X $DATADIR");
+	
+    //rc.mysqld
+    exec_log("cp /usr/share/mysql/mysql.server /etc/rc.d/rc.mysql");
+    exec_log("sed -i -e '/^datadir=/c\\datadir='$DATADIR'' /etc/rc.d/rc.mysql");
+    exec_log("sed -i -e '/^mysqld_pid_file_path=/c\\mysqld_pid_file_path=/var/run/mysql/mysql.pid' /etc/rc.d/rc.mysql");
+    exec_log("sed -i -e '/^user=/c\\user=mysql' /etc/rc.d/rc.mysqld");
+    exec_log("sed -i -e '/^basedir=/c\\basedir=/usr' /etc/rc.d/rc.mysql");
+
+    
+
+    if (file_exists("/boot/config/plugins/mysql/my.cnf")) {
+      unlink("/etc/my.cnf");
+      exec_log("cp /boot/config/plugins/mysql/my.cnf /etc/my.cnf");
+	  //fix permissions of my.cnf
+	  exec_log("chmod 644 /etc/my.cnf");
+    }
+    else {
+      exec_log("cp /etc/mysql/my-medium.cnf /etc/my.cnf");
+      exec_log("sed -i -e '/^#innodb_data_home_dir/c\\innodb_data_home_dir = '$DATADIR'' /etc/my.cnf");
+      exec_log("sed -i -e '/^#innodb_log_group_home_dir/c\\innodb_log_group_home_dir = '$DATADIR'' /etc/my.cnf");
+      exec_log("sed -i -e '/^#innodb_log_arch_dir/c\\innodb_log_arch_dir = '$DATADIR'' /etc/my.cnf");
+    }
+
+    if (!is_dir("$DATADIR/mysql")) {
+      echo("Runnings mysql_install_db...");
+      exec_log("/usr/bin/mysql_install_db --basedir=/usr --datadir=$DATADIR --user=mysql");
+      exec_log("chmod -R go-rwx,u-x,g+u,ug+X $DATADIR");
+    }
+     
+    echo("Completed$newline");  
+  }
+  
+  function saveconfig () {
+    echo("Saving Settings...");
+    global $_POST, $configfile, $settings, $newline;
+
+    $string .= "#mysql configuration\n";
+
+    foreach ($_POST as $key=>$value) {
+      if (in_array($key, $settings)) {
+        $string .= "$key=\"$value\"\n";
+      }
+    }
+    
+    write_string($configfile, $string, TRUE);
+    
+    echo("Completed$newline ");
+	exec_log("/boot/config/plugins/mysql/mysql_cron.sh");
+  }
+  
+  function exec_log($cmd) {
+
+    $results = exec($cmd);
+    
+    $results = "\nCMD: $cmd \nResults: $results";
+    write_log($results);
+  }
+
+  function write_log($contents) {
+    global $logfile;
+    write_string($logfile, "$contents\n", FALSE);
+  }
+    
+  function write_string ($file, $contents, $overwrite) {
+    if (file_exists($file)) {
+      if ($overwrite)
+          unlink($file);
+          touch($file);
+    }
+    else {
+      touch($file);
+    }
+    
+    $fp = @fopen($file, 'a');
+    @flock($fp, LOCK_EX);
+    @fwrite($fp, $contents);
+    @flock($fp, LOCK_UN);
+    @fclose($fp);
+  }
+  
+  function updateplg()
+{
+	exec_log("wget -o /var/log/mysql_install.log -P /tmp --no-check-certificate dl.dropboxusercontent.com/s/j0abbn1fzdn41at/mysql-ikosa.plg");
+    echo ("Downloading plugin...");
+	if (is_file("/tmp/mysql-ikosa.plg")) 
+	{
+      exec_log("mv -f /boot/config/plugins/mysql-ikosa.plg /boot/config/plugins/mysql/mysql-ikosa.plg.old | tee /var/log/mysql_install.log");
+      exec_log("mv -f /tmp/mysql-ikosa.plg /boot/config/plugins/mysql-ikosa.plg | tee /var/log/mysql_install.log");
+      exec_log("/usr/local/sbin/installplg /boot/config/plugins/mysql-ikosa.plg | tee /var/log/mysql_install.log");
+	  echo ("Plugin updated succesfully."); 
+    }
+    else
+	{
+	  echo ("Download failed, update aborted!");
+    }
+}
+
+  function run_backup()
+{
+	echo ("Starting backup...");
+	exec_log("/boot/config/plugins/mysql/mysql_backup.sh");
+	echo ("Done.");
+}
+?>
+]]>
+</INLINE>
+</FILE>
+
+<FILE Name="/etc/rc.d/rc.ikosa" Mode="0770">
+<INLINE>
+<![CDATA[
+#!/bin/bash
+# getver
+
+ikosa_plgver()
+{
+	  case "$2" in
+		'local')
+		  if [ -f /usr/local/emhttp/plugins/$1/$1.page ]; then
+			VERSION=$(grep "Version=" /usr/local/emhttp/plugins/$1/$1.page | cut -d\" -f2)
+		  else
+			VERSION=Unknown
+		  fi
+		;;
+		'remote')
+		  VERSION=$(wget --no-check-certificate dl.dropboxusercontent.com/s/4kj74vlun9llb65/ikosa-version.cfg -q -O - | grep -i $1 | cut -d'"' -f2)
+		  if [ "$VERSION" == "" ]; then
+			VERSION=Unknown
+		  fi
+		;;
+  esac
+  echo -n "$VERSION"
+}
+
+ikosa_getver()
+{
+  if [[ ! -z $1 && ! -z $2 ]]; then
+  case "$1" in
+    'control_panel')
+      ikosa_plgver $1 $2
+    ;;
+    'mysql')
+      ikosa_plgver $1 $2
+    ;;   
+  esac
+  else
+    echo "usage $0 getver plugin_name local|remote"
+  fi
+}
+
+case "$1" in
+  'updateplg')
+    ikosa_updateplg
+  ;;
+  'getver')
+    ikosa_getver $2 $3
+    ;;
+  *)
+    echo "usage $0 getver plugin_name local|remote"
+esac
+]]>
+</INLINE>
+</FILE>
+
+<!-- event handler -->
+<FILE Name="/usr/local/emhttp/plugins/mysql/event/disks_mounted" Mode="0770">
+<INLINE>
+<![CDATA[
+#!/bin/bash
+#load plugin config
+source /boot/config/plugins/mysql/mysql.cfg
+
+#Start mysql if enabled
+[ $SERVICE = "enable" ] && php /usr/local/emhttp/plugins/mysql/mysqlctl.php "cmd=Apply&SERVICE=$SERVICE&DATADIR=$DATADIR&BACKUP=$BACKUP&BACKUP_FREQUENCY=$BACKUP_FREQUENCY&BACKUP_HOUR=$BACKUP_HOUR&BACKUPDIR=$BACKUPDIR&BACKUP_USERNAME=$BACKUP_USERNAME&BACKUP_PASS=$BACKUP_PASS&SEND_MAIL=$SEND_MAIL&MAIL_TO=$MAIL_TO&BACKUP_MIN_SIZE=$BACKUP_MIN_SIZE"
+]]>
+</INLINE>
+</FILE>
+
+<!-- event handler -->
+<FILE Name="/usr/local/emhttp/plugins/mysql/event/unmounting_disks" Mode="0770">
+<INLINE>
+<![CDATA[
+#!/bin/bash
+/etc/rc.d/rc.mysqld stop
+]]>
+</INLINE>
+</FILE>
+
+</PLUGIN>
