@@ -62,7 +62,7 @@ rm /tmp/sickbeard-cleanup
 <FILE Name="/boot/config/plugins/sickbeard/plgver.txt">
 <INLINE>
 <![CDATA[
-3.0.1
+3.0.2
 ]]>
 </INLINE>
 </FILE>
