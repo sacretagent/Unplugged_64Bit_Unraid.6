@@ -104,7 +104,7 @@ rm /tmp/checkconfig
 <FILE Name="/boot/config/plugins/sabnzbd/plgver.txt">
 <INLINE>
 <![CDATA[
-3.0.1
+3.0.2
 ]]>
 </INLINE>
 </FILE>
