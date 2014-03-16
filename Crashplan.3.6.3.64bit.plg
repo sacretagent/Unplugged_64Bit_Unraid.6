@@ -22,6 +22,31 @@ The plugin provides CrashPlan support for unRAID systems.
 <URL>http://lime-technology.com/wiki/images/5/59/Crashplan.png</URL>
 </FILE>
 
+<FILE Name="/boot/config/plugins/CrashPlan/CrashPlan.cfg">
+<INLINE>
+<![CDATA[
+# CrashPlan configuration
+SERVICE="disable"
+INSTALLDIR="/usr/local/crashplan"
+]]>
+</INLINE>
+</FILE>
+
+<FILE Name="/tmp/CrashPlan-upgrade" Run="/bin/bash">
+<INLINE>
+<![CDATA[
+#Remove currently installed plugin files
+[ -d /usr/local/emhttp/plugins/CrashPlan/ ] && rm -rf /usr/local/emhttp/plugins/CrashPlan
+
+rm /tmp/CrashPlan-upgrade
+]]>
+</INLINE>
+</FILE>
+
+<FILE Name="/usr/local/emhttp/plugins/CrashPlan/CrashPlan.png">
+<LOCAL>/boot/config/plugins/CrashPlan/CrashPlan.png</LOCAL>
+</FILE>
+
 <FILE Name="/usr/local/emhttp/plugins/CrashPlan/CrashPlan.page">
 <INLINE>
 <![CDATA[
