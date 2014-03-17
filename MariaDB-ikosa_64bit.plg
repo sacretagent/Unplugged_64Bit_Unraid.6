@@ -551,11 +551,11 @@ checkRUNNING(document.mysql_settings);
     exec_log("chown -hR mysql:users $DATADIR");
     exec_log("chmod -R go-rwx,u-x,g+u,ug+X $DATADIR");
 	
-    //rc.mysqld
+    //rc.mysql
     exec_log("cp /usr/share/mysql/mysql.server /etc/rc.d/rc.mysql");
     exec_log("sed -i -e '/^datadir=/c\\datadir='$DATADIR'' /etc/rc.d/rc.mysql");
     exec_log("sed -i -e '/^mysqld_pid_file_path=/c\\mysqld_pid_file_path=/var/run/mysql/mysql.pid' /etc/rc.d/rc.mysql");
-    exec_log("sed -i -e '/^user=/c\\user=mysql' /etc/rc.d/rc.mysqld");
+    exec_log("sed -i -e '/^user=/c\\user=mysql' /etc/rc.d/rc.mysql");
     exec_log("sed -i -e '/^basedir=/c\\basedir=/usr' /etc/rc.d/rc.mysql");
 
     
@@ -733,7 +733,7 @@ source /boot/config/plugins/mysql/mysql.cfg
 <INLINE>
 <![CDATA[
 #!/bin/bash
-/etc/rc.d/rc.mysqld stop
+/etc/rc.d/rc.mysql stop
 ]]>
 </INLINE>
 </FILE>
