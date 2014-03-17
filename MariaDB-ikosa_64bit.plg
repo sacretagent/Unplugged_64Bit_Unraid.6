@@ -58,8 +58,8 @@ The plugin provides mysql support for unRAID systems.
 <MD5>8f1a4263ca82e02bed4d2930447fd6fa</MD5>
 </FILE>
 
-<FILE Name="/boot/config/plugins/mysql/mysql.png">
-<URL>http://lime-technology.com/wiki/images/d/d3/Mysql.png</URL>
+<FILE Name="/boot/config/plugins/mysql/MariaDB_logo.png">
+<URL>--no-check-certificate https://dl.dropboxusercontent.com/u/29067424/MariaDB_logo.png</URL>
 </FILE>
 
 <FILE Name="/boot/config/plugins/mysql/mysql.cfg">
@@ -192,15 +192,15 @@ fi
 </INLINE>
 </FILE>
 
-<FILE Name="/usr/local/emhttp/plugins/mysql/mysql.png">
-<LOCAL>/boot/config/plugins/mysql/mysql.png</LOCAL>
+<FILE Name="/usr/local/emhttp/plugins/mysql/MariaDB_logo.png">
+<LOCAL>/boot/config/plugins/mysql/MariaDB_logo.png</LOCAL>
 </FILE>
 
 <FILE Name="/usr/local/emhttp/plugins/mysql/mysql.page">
 <INLINE>
 <![CDATA[
 Menu="NetworkServices"
-Icon="mysql.png"
+Icon="MariaDB_logo.png"
 Version="0.2.3"
 Author="SeeDrs, p1lot, thedude459, CHBMB, Ikosa"
 Type="php"
