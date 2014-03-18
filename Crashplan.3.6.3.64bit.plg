@@ -200,6 +200,7 @@ checkRUNNING(document.CrashPlan_settings);
 
 <?PHP
 # Some variables
+date_default_timezone_set(substr(readlink("/etc/localtime-copied-from"), 20));
 $logfile = "/var/log/plugins/crashplan.log";
 $configfile = "/boot/config/plugins/CrashPlan/CrashPlan.cfg";
 $ln = empty($_SERVER['SHELL']) ? "<br>" : PHP_EOL;
