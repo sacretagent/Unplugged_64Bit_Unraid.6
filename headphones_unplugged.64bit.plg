@@ -58,7 +58,7 @@ rm /tmp/headphones-cleanup
 <FILE Name="/boot/config/plugins/headphones/plgver.txt">
 <INLINE>
 <![CDATA[
-3.0.2
+3.0.3
 ]]>
 </INLINE>
 </FILE>
@@ -266,7 +266,7 @@ headphones_install()
 	cd /tmp
 	git clone -b master https://github.com/rembo10/headphones headphones
 	cp -Rfu /tmp/headphones/* $INSTALLDIR
-	rm -Rf /tmp/Couchpotato
+	rm -Rf /tmp/headphones
 }
 
 headphones_storagesize() 
