@@ -442,7 +442,7 @@ checkRUNNING(document.mysql_settings);
 	"BACKUP_MIN_SIZE",
   );
 
-  parse_str($argv[1],$_POST);
+  #parse_str($argv[1],$_POST);
 
   $SERVICE=$_POST['SERVICE'];
   $DATADIR=$_POST['DATADIR'];
@@ -453,7 +453,7 @@ checkRUNNING(document.mysql_settings);
     case 'Apply':
       saveconfig();
       
-      if ($SERVICE == "enable") {
+      if ("$SERVICE" == "enable") {
         applyconfig();
         startmysql();
       }
